@@ -76,15 +76,15 @@ st.markdown("---")
 
 # --- REGİONAL BAZA VƏ KOORDİNATLAR ---
 regions_data = {
-    "Oğuz (Dağ-meşə qəhvəyi torpaqlar)": {
+    "Oğuz (Dağ-meşə qəhvəyi torpaqlar)": 
         "ph": 6.2, "n": 48.0, "ndvi": 0.74, "moisture": 35.0,
         "lat": 41.0714, "lon": 47.4653, "climate": "Mülayim-rütubətli / Humid Subtropical"
     },
-    "Bakı / Abşeron (Boz-qonur şorakət torpaqlar)": {
+    "Bakı / Abşeron (Boz-qonur şorakət torpaqlar)": 
         "ph": 7.9, "n": 21.0, "ndvi": 0.29, "moisture": 14.0,
         "lat": 40.4093, "lon": 49.8671, "climate": "Quru yarımsəhra / Semi-arid"
     },
-    "Gəncə-Qazax (Şabalıdı torpaqlar)": {
+    "Gəncə-Qazax (Şabalıdı torpaqlar)": 
         "ph": 7.1, "n": 38.0, "ndvi": 0.58, "moisture": 25.0,
         "lat": 40.6828, "lon": 46.3606, "climate": "Quru subtropik / Dry Subtropical"
     },
