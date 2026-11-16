@@ -5,9 +5,10 @@ import numpy as np
 # Səhifə konfiqurasiyası
 st.set_page_config(
     page_title="C.h.e.MartixAZE v3.0 Final",
-    page_icon="🌱",
+    page_icon="logo.png",
     layout="wide"
 )
+
 # --- PWA (MOBILE APP) QABIĞI ---
 pwa_code = """
 <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
