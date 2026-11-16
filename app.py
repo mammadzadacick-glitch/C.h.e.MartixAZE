@@ -18,13 +18,22 @@ pwa_code = """
   'display': 'standalone',
   'background_color': '#0e1117',
   'theme_color': '#0e1117',
-  'icons': [{
-    'src': 'logo.png',
-    'sizes': '192x192',
-    'type': 'image/png'
-  }]
+  'icons': [
+    {
+      'src': 'logo.png',
+      'sizes': '192x192',
+      'type': 'image/png'
+    },
+    {
+      'src': 'logo.png',
+      'sizes': '512x512',
+      'type': 'image/png'
+    }
+  ]
 }">
 """
+st.markdown(pwa_code, unsafe_allow_html=True)
+
 st.markdown(pwa_code, unsafe_allow_html=True)
 
 # --- DİL SEÇİMİ ---
