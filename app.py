@@ -88,6 +88,6 @@ regions_data = {
         "ph": 7.1, "n": 38.0, "ndvi": 0.58, "moisture": 25.0,
         "lat": 40.6828, "lon": 46.3606, "climate": "Quru subtropik / Dry Subtropical"
     },
-    "Aran Bölgəsi / Kürdəmir (Çəmən-boz torpaqlar)": {
+    "Aran Bölgəsi / Kürdəmir (Çəmən-boz torpaqlar)":
         "ph": 7.6, "n": 28.0, "ndvi": 0.42, "moisture": 18.0,
         "lat": 40.3453, "lon":
