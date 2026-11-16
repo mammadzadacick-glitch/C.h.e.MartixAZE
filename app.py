@@ -8,7 +8,6 @@ st.set_page_config(
     page_icon="🌱",
     layout="wide"
 )
-
 # --- PWA (MOBILE APP) QABIĞI ---
 pwa_code = """
 <link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
@@ -19,14 +18,13 @@ pwa_code = """
   'background_color': '#0e1117',
   'theme_color': '#0e1117',
   'icons': [{
-    'src': 'https://img.icons8.com/color/192/sprout.png',
+    'src': 'logo.png',
     'sizes': '192x192',
     'type': 'image/png'
   }]
 }">
 """
 st.markdown(pwa_code, unsafe_allow_html=True)
-
 
 # --- DİL SEÇİMİ ---
 st.sidebar.title("🌍 Parametrlər / Settings")
