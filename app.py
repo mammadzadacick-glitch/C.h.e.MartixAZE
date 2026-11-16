@@ -20,10 +20,8 @@ manifest_data = {
     "icons": [
         {"src": "logo.png", "sizes": "192x192", "type": "image/png"},
         {"src": "logo.png", "sizes": "512x512", "type": "image/png"},
-    ],
-}
-
-# Python avtomatik olaraq JSON-u təmiz stringə çevirir (ikiqat dırnaqlarla)
+    
+        # Python avtomatik olaraq JSON-u təmiz stringə çevirir (ikiqat dırnaqlarla)
 manifest_json = json.dumps(manifest_data)
 
 pwa_code = f"""
