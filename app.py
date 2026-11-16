@@ -1,15 +1,16 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import json
 
 # Səhifə konfiqurasiyası
 st.set_page_config(
     page_title="C.h.e.MartixAZE v3.0 Final",
     page_icon="logo.png",
     layout="wide"
-import json
+)
 
-# Manifest məlumatlarını düzgün JSON formatında qururuq
+# --- PWA (MOBILE APP) QABIĞI ---
 manifest_data = {
     "name": "C.h.e.MartixAZE",
     "short_name": "MartixAZE",
@@ -20,18 +21,14 @@ manifest_data = {
     "icons": [
         {"src": "logo.png", "sizes": "192x192", "type": "image/png"},
         {"src": "logo.png", "sizes": "512x512", "type": "image/png"},
-    
-        # Python avtomatik olaraq JSON-u təmiz stringə çevirir (ikiqat dırnaqlarla)
+    ],
+}
+
 manifest_json = json.dumps(manifest_data)
 
 pwa_code = f"""
 <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{manifest_json}'>
 """
-st.markdown(pwa_code, unsafe_allow_html=True)
-
-
-st.markdown(pwa_code, unsafe_allow_html=True)
-
 st.markdown(pwa_code, unsafe_allow_html=True)
 
 # --- DİL SEÇİMİ ---
