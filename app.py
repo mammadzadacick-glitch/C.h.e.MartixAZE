@@ -9,6 +9,25 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- PWA (MOBILE APP) QABIĞI ---
+pwa_code = """
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,{
+  'name': 'C.h.e.MartixAZE',
+  'short_name': 'MartixAZE',
+  'start_url': '.',
+  'display': 'standalone',
+  'background_color': '#0e1117',
+  'theme_color': '#0e1117',
+  'icons': [{
+    'src': 'https://img.icons8.com/color/192/sprout.png',
+    'sizes': '192x192',
+    'type': 'image/png'
+  }]
+}">
+"""
+st.markdown(pwa_code, unsafe_allow_html=True)
+
+
 # --- DİL SEÇİMİ ---
 st.sidebar.title("🌍 Parametrlər / Settings")
 lang = st.sidebar.selectbox("Dil / Language", ["Azərbaycan", "English"])
