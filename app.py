@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import requests
 
 # Səhifə konfiqurasiyası
 st.set_page_config(
@@ -10,68 +9,63 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- DİL SEÇİMİ VƏ TƏRCÜMƏLƏR ---
+# --- DİL SEÇİMİ ---
 st.sidebar.title("🌍 Parametrlər / Settings")
 lang = st.sidebar.selectbox("Dil / Language", ["Azərbaycan", "English"])
 
-t = {
-    "AZ": {
-        "title": "🌱 C.h.e.MartixAZE: Süni İntellektlə Torpaq və Ekosistem İdarəetməsi",
-        "subtitle": "NASA peyk məlumatları və aqrokimyəvi analiz əsasında qərar qətnetmə paneli.",
-        "sidebar_header": "🎛️ Daxil Edilən Parametrlər",
-        "mode": "Rejim Seçimi",
-        "mode_manual": "Manual Daxiletmə (Sürüşdürücülər)",
-        "mode_region": "Rayon / Region Seçimi (Avtomatik NASA/Aqrokimya)",
-        "region_select": "Rayon seçin:",
-        "ph": "Torpağın pH səviyyəsi",
-        "nitrogen": "Azot (N) miqdarı (mq/kg)",
-        "ndvi": "NASA Peyk NDVI (Bitki Sağlamlıq İndeksi)",
-        "moisture": "Torpağın Rütubəti (%)",
-        "btn": " экоsistem Analiz Et və Qərar Çıxar",
-        "results": "📊 Süni İntellekt və Aqrokimyəvi Təhlil Nəticələri",
-        "status_ok": "✅ Torpaq və ekosistem parametrləri normal səviyyədədir.",
-        "status_warn": "⚠️ Diqqət! Torpaqda balanssızlıq aşkar edildi.",
-        "rec_title": "💡 Mühəndislik və Gübrələmə Tövsiyələri:",
-        "rec_ph": "• pH Tənzimlənməsi: Torpağın turşuluğunu normallaşdırmaq üçün tədbir görülməlidir.",
-        "rec_n": "• Azot Təminatı: Bitkinin inkişafı üçün uyğun miqdarda azot gübrəsi (karbamid/ammonium nitrat) əlavə edilməlidir.",
-        "rec_water": "• Suvarma Rejimi: NASA peyk rütubət göstəricilərinə əsasən suvarma cədvəli optimallaşdırılmalıdır."
-    },
-    "EN": {
-        "title": "🌱 C.h.e.MartixAZE: AI-Driven Soil & Ecosystem Management",
-        "subtitle": "Decision-making dashboard based on NASA satellite data and agrochemical analysis.",
-        "sidebar_header": "🎛️ Input Parameters",
-        "mode": "Select Mode",
-        "mode_manual": "Manual Input (Sliders)",
-        "mode_region": "Region Selection (Auto NASA/Agrochemical)",
-        "region_select": "Select Region:",
-        "ph": "Soil pH Level",
-        "nitrogen": "Nitrogen (N) Content (mg/kg)",
-        "ndvi": "NASA Satellite NDVI (Vegetation Health Index)",
-        "moisture": "Soil Moisture (%)",
-        "btn": "🔍 Analyze Ecosystem & Decision",
-        "results": "📊 AI & Agrochemical Analysis Results",
-        "status_ok": "✅ Soil and ecosystem parameters are at normal levels.",
-        "status_warn": "⚠️ Warning! Imbalance detected in the soil.",
-        "rec_title": "💡 Engineering & Fertilization Recommendations:",
-        "rec_ph": "• pH Adjustment: Measures should be taken to normalize soil acidity.",
-        "rec_n": "• Nitrogen Supply: Appropriate amount of nitrogen fertilizer should be applied.",
-        "rec_water": "• Irrigation Regime: Irrigation schedule should be optimized based on NASA satellite moisture metrics."
-    }
-}
+# --- TƏRCÜMƏLƏR ---
+if lang == "Azərbaycan":
+    title_text = "🌱 C.h.e.MartixAZE: Süni İntellektlə Torpaq və Ekosistem İdarəetməsi"
+    subtitle_text = "NASA peyk məlumatları və aqrokimyəvi analiz əsasında qərar qəbuletmə paneli."
+    sidebar_title = "🎛️ Daxil Edilən Parametrlər"
+    mode_label = "Rejim Seçimi"
+    mode_m = "Manual Daxiletmə (Sürüşdürücülər)"
+    mode_r = "Rayon / Region Seçimi (Avtomatik)"
+    reg_select_label = "Rayon seçin:"
+    ph_label = "Torpağın pH səviyyəsi"
+    n_label = "Azot (N) miqdarı (mq/kg)"
+    ndvi_label = "NASA Peyk NDVI (Bitki Sağlamlıq İndeksi)"
+    moist_label = "Torpağın Rütubəti (%)"
+    btn_label = "🔍 Ekosistem Analiz Et və Qərar Çıxar"
+    res_title = "📊 Süni İntellekt və Aqrokimyəvi Təhlil Nəticələri"
+    ok_text = "✅ Torpaq və ekosistem parametrləri normal səviyyədədir."
+    warn_text = "⚠️ Diqqət! Torpaqda balanssızlıq aşkar edildi."
+    rec_heading = "💡 Mühəndislik və Gübrələmə Tövsiyələri:"
+    rec_p = "• pH Tənzimlənməsi: Torpağın turşuluğunu normallaşdırmaq üçün tədbir görülməlidir."
+    rec_nitrogen = "• Azot Təminatı: Bitkinin inkişafı üçün uyğun miqdarda azot gübrəsi əlavə edilməlidir."
+    rec_w = "• Suvarma Rejimi: NASA peyk rütubət göstəricilərinə əsasən suvarma cədvəli optimallaşdırılmalıdır."
+    info_reg = "📍 Seçilən bölgə üçün avtomatik yüklənən baza dəyərləri tətbiq olundu."
+    info_start = "👈 Zəhmət olmasa parametrləri təyin edib düyməyə basın."
+else:
+    title_text = "🌱 C.h.e.MartixAZE: AI-Driven Soil & Ecosystem Management"
+    subtitle_text = "Decision-making dashboard based on NASA satellite data and agrochemical analysis."
+    sidebar_title = "🎛️ Input Parameters"
+    mode_label = "Select Mode"
+    mode_m = "Manual Input (Sliders)"
+    mode_r = "Region Selection (Auto NASA/Agrochemical)"
+    reg_select_label = "Select Region:"
+    ph_label = "Soil pH Level"
+    n_label = "Nitrogen (N) Content (mg/kg)"
+    ndvi_label = "NASA Satellite NDVI (Vegetation Health Index)"
+    moist_label = "Soil Moisture (%)"
+    btn_label = "🔍 Analyze Ecosystem & Decision"
+    res_title = "📊 AI & Agrochemical Analysis Results"
+    ok_text = "✅ Soil and ecosystem parameters are at normal levels."
+    warn_text = "⚠️ Warning! Imbalance detected in the soil."
+    rec_heading = "💡 Engineering & Fertilization Recommendations:"
+    rec_p = "• pH Adjustment: Measures should be taken to normalize soil acidity."
+    rec_nitrogen = "• Nitrogen Supply: Appropriate amount of nitrogen fertilizer should be applied."
+    rec_w = "• Irrigation Regime: Irrigation schedule should be optimized based on NASA satellite moisture metrics."
+    info_reg = "📍 Automatic baseline values loaded for the selected region."
+    info_start = "👈 Please set the parameters and click the button."
 
-# Seçilmiş dilə uyğun lüğət
-d = t[lang]
-
-# Əsas başlıqlar
-st.title(d["title"])
-st.write(d["subtitle"])
+st.title(title_text)
+st.write(subtitle_text)
 st.markdown("---")
 
-# --- SOL PANEL (Daxiletmələr) ---
-st.sidebar.header(d["sidebar_header"])
-mode = st.sidebar.radio(d["mode"], [d["mode_manual"], d["mode_region"]])
+st.sidebar.header(sidebar_title)
+mode = st.sidebar.radio(mode_label, [mode_m, mode_r])
 
-# Rayonlar üzrə bazalar (Ön təyinli dəyərlər)
 regions_data = {
     "Oğuz (Dağ-meşə qəhvəyi torpaqlar)": {"ph": 6.2, "n": 48.0, "ndvi": 0.74, "moisture": 35.0},
     "Baku / Abşeron (Boz-qonur torpaqlar)": {"ph": 7.8, "n": 22.0, "ndvi": 0.31, "moisture": 15.0},
@@ -79,8 +73,8 @@ regions_data = {
     "Aran Bölgəsi / Mərkəz (Çəmən-boz torpaqlar)": {"ph": 7.5, "n": 30.0, "ndvi": 0.45, "moisture": 20.0}
 }
 
-if mode == d["mode_region"]:
-    selected_reg = st.sidebar.selectbox(d["region_select"], list(regions_data.keys()))
+if mode == mode_r:
+    selected_reg = st.sidebar.selectbox(reg_select_label, list(regions_data.keys()))
     reg_vals = regions_data[selected_reg]
     
     ph = reg_vals["ph"]
@@ -88,18 +82,16 @@ if mode == d["mode_region"]:
     ndvi = reg_vals["ndvi"]
     moisture = reg_vals["moisture"]
     
-    st.sidebar.info(f"📍 Seçilən bölgə üçün avtomatik yüklənən baza dəyərləri tətbiq olundu.")
+    st.sidebar.info(info_reg)
 else:
-    ph = st.sidebar.slider(d["ph"], 4.0, 10.0, 6.5)
-    nitrogen = st.sidebar.slider(d["nitrogen"], 10.0, 100.0, 45.0)
-    ndvi = st.sidebar.slider(d["ndvi"], 0.0, 1.0, 0.65)
-    moisture = st.sidebar.slider(d["moisture"], 5.0, 60.0, 28.0)
+    ph = st.sidebar.slider(ph_label, 4.0, 10.0, 6.5)
+    nitrogen = st.sidebar.slider(n_label, 10.0, 100.0, 45.0)
+    ndvi = st.sidebar.slider(ndvi_label, 0.0, 1.0, 0.65)
+    moisture = st.sidebar.slider(moist_label, 5.0, 60.0, 28.0)
 
-# Analiz düyməsi
-if st.sidebar.button(d["btn"], type="primary"):
-    st.subheader(d["results"])
+if st.sidebar.button(btn_label, type="primary"):
+    st.subheader(res_title)
     
-    # Metriklər panel şəklində
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("pH Level", f"{ph}")
     col2.metric("Nitrogen (N)", f"{nitrogen} mg/kg")
@@ -108,22 +100,20 @@ if st.sidebar.button(d["btn"], type="primary"):
     
     st.markdown("---")
     
-    # Süni intellekt qərar mühərriki məntiqi
     if 6.0 <= ph <= 7.5 and nitrogen >= 40 and ndvi >= 0.5:
-        st.success(d["status_ok"])
+        st.success(ok_text)
     else:
-        st.warning(d["status_warn"])
+        st.warning(warn_text)
         
-    st.markdown(f"### {d['rec_title']}")
-    st.write(d["rec_ph"])
-    st.write(d["rec_n"])
-    st.write(d["rec_water"])
+    st.markdown(f"### {rec_heading}")
+    st.write(rec_p)
+    st.write(rec_nitrogen)
+    st.write(rec_w)
     
-    # Kiçik vizual qrafik əlavəsi
     chart_data = pd.DataFrame({
         "Parametr": ["pH (x10)", "Azot (N)", "NDVI (x100)", "Rütubət"],
         "Dəyər": [ph * 10, nitrogen, ndvi * 100, moisture]
     })
     st.bar_chart(chart_data.set_index("Parametr"))
 else:
-    st.info("👈 Zəhmət olmasa parametrləri təyin edib **'Analiz Et və Qərar Çıxar'** düyməsinə basın.")
+    st.info(info_start)
