@@ -75,7 +75,7 @@ st.write(subtitle_text)
 st.markdown("---")
 
 # --- REGİONAL BAZA VƏ KOORDİNATLAR ---
-regions_data = {
+regions_data =
     "Oğuz (Dağ-meşə qəhvəyi torpaqlar)": 
         "ph": 6.2, "n": 48.0, "ndvi": 0.74, "moisture": 35.0,
         "lat": 41.0714, "lon": 47.4653, "climate": "Mülayim-rütubətli / Humid Subtropical"
