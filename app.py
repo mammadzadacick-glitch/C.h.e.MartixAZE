@@ -266,7 +266,7 @@ if st.sidebar.button(btn_label, type="primary"):
     st.divider()
 
     zone_name = "Manual_Input" if "Manual" in str(mode) or "Manuel" in str(mode) else selected_reg
-        base_ec = 1.3
+    base_ec = 1.3
     base_days_lab = 35 if "Manual" in str(mode) or "Manuel" in str(mode) else 12
     base_cloud = 12
 
