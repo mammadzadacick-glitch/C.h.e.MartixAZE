@@ -293,15 +293,14 @@ if st.sidebar.button(btn_label, type="primary"):
             "cloud_cover": base_cloud,
         },
     ]
-
-            "zone_id": zone_name,
-            "date": "2026-10-15",
-            "ndvi": round(max(min(float(ndvi) + 0.08, 0.95), 0.05), 3),
-            "soil_moisture": round(min(float(moisture) + 3.0, 95.0), 1),
-            "ph": round(float(reg_info.get("ph", ph)) if isinstance(reg_info, dict) else float(ph), 2),
-            "ec_ds_m": base_ec,
-            "days_since_lab": max(base_days_lab - 15, 1),
-            "cloud_cover": max(base_cloud - 4, 0),
+           "zone_id": zone_name,
+           "date": "2026-10-15",
+           "ndvi": round(max(min(float(ndvi) + 0.08, 0.95), 0.05), 3),
+           "soil_moisture": round(min(float(moisture) + 3.0, 95.0), 1),
+           "ph": round(float(ph), 2),
+           "ec_ds_m": base_ec,
+           "days_since_lab": max(base_days_lab - 15, 1),
+           "cloud_cover": max(base_cloud - 4, 0),
         },
         {
             "zone_id": zone_name,
