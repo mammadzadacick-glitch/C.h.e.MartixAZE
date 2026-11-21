@@ -266,13 +266,34 @@ if st.sidebar.button(btn_label, type="primary"):
     st.divider()
 
     zone_name = "Manual_Input" if "Manual" in str(mode) or "Manuel" in str(mode) else selected_reg
-    base_ec = round(float(reg_info.get("ec", 1.3)), 2) if isinstance(reg_info, dict) else 1.3
-    base_days_lab = 35 if mode == mode_b else 12
+        base_ec = 1.3
+    base_days_lab = 35 if "Manual" in str(mode) or "Manuel" in str(mode) else 12
     base_cloud = 12
 
     # Zaman müqayisəsi üçün bazis + cari ölçüm qeydləri
     records = [
         {
+            "zone_id": zone_name,
+            "date": "2026-10-15",
+            "ndvi": round(max(min(float(ndvi) + 0.08, 0.95), 0.05), 3),
+            "soil_moisture": round(min(float(moisture) + 3.0, 95.0), 1),
+            "ph": round(float(ph), 2),
+            "ec_ds_m": base_ec,
+            "days_since_lab": max(base_days_lab - 15, 1),
+            "cloud_cover": max(base_cloud - 4, 0),
+        },
+        {
+            "zone_id": zone_name,
+            "date": "2026-11-21",
+            "ndvi": round(float(ndvi), 3),
+            "soil_moisture": round(float(moisture), 1),
+            "ph": round(float(ph), 2),
+            "ec_ds_m": round(max(base_ec + (0.9 if float(ph) > 7.8 or float(ph) < 5.5 else 0.2), 0.2), 2),
+            "days_since_lab": base_days_lab,
+            "cloud_cover": base_cloud,
+        },
+    ]
+
             "zone_id": zone_name,
             "date": "2026-10-15",
             "ndvi": round(max(min(float(ndvi) + 0.08, 0.95), 0.05), 3),
