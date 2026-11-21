@@ -97,6 +97,110 @@ regions_data = {
     "Aran Bölgəsi": {"ph": 7.6, "n": 28.0, "ndvi": 0.42, "moisture": 18.0, "lat": 40.3453, "lon": 48.1508},
     "Lənkəran-Astara": {"ph": 5.6, "n": 52.0, "ndvi": 0.81, "moisture": 44.0, "lat": 38.7543, "lon": 48.8506}
 }
+import pandas as pd
+import numpy as np
+
+
+def run_chematrix_decision_engine(records: list[dict]) -> list[dict]:
+    """
+    C.h.e.MartixAZE üçün:
+    1. Zaman üzrə kimyəvi/spektral dəyişiklik müqayisəsi
+    2. pH, EC və NDVI əsaslı risk siqnalı
+    3. Lab nümunəsi üçün ağıllı zona seçimi
+    4. Sİ etibarlılıq göstəricisi və riskli qərar xəbərdarlığı
+    5. Fermer üçün aydın + analitik video/brifinq ssenarisi
+    """
+    df = pd.DataFrame(records)
+    df["date"] = pd.to_datetime(df["date"])
+    outputs = []
+
+    for zone_id, group in df.groupby("zone_id"):
+        g = group.sort_values("date").reset_index(drop=True)
+        base = g.iloc[0]
+        curr = g.iloc[-1]
+
+        # 1. Zaman xəritəsi fərqləri
+        d_ndvi = round(float(curr["ndvi"] - base["ndvi"]), 3)
+        d_ph = round(float(curr["ph"] - base["ph"]), 2)
+        d_ec = round(float(curr["ec_ds_m"] - base["ec_ds_m"]), 2)
+        d_moist = round(float(curr["soil_moisture"] - base["soil_moisture"]), 1)
+
+        # 2. Risk siqnalı (pH + EC + NDVI)
+        risk_points = 0
+        signals = []
+
+        if curr["ph"] < 5.5 or curr["ph"] > 7.8 or abs(d_ph) >= 0.7:
+            risk_points += 40
+            signals.append(f"pH dəyişimi/həddi ({base['ph']} → {curr['ph']})")
+
+        if curr["ec_ds_m"] >= 2.5 or d_ec >= 1.0:
+            risk_points += 40
+            signals.append(f"EC/duzluluq artımı ({base['ec_ds_m']} → {curr['ec_ds_m']} dS/m)")
+
+        if d_ndvi <= -0.15:
+            risk_points += 20
+            signals.append(f"NDVI enişi ({d_ndvi})")
+
+        if risk_points >= 60:
+            risk_status = "YÜKSƏK RİSK"
+        elif risk_points >= 30:
+            risk_status = "ORTA RİSK"
+        else:
+            risk_status = "NORMAL"
+
+        # 4. Etibarlılıq göstəricisi (%)
+        reliability = 100.0
+        reliability -= min(float(curr["days_since_lab"]) * 0.65, 45.0)
+        reliability -= min(float(curr["cloud_cover"]) * 0.75, 25.0)
+        if abs(d_ph) >= 0.8 or d_ec >= 1.5:
+            reliability -= 15.0  # Kəskin dəyişiklikdə model təkbaşına tam etibarlı sayılmır
+
+        reliability = round(max(min(reliability, 98.0), 15.0), 1)
+        lab_mandatory_before_action = reliability < 65.0 or risk_status == "YÜKSƏK RİSK"
+
+        # 3. Laboratoriya yoxlaması üçün ağıllı seçim
+        need_lab = risk_status in ("YÜKSƏK RİSK", "ORTA RİSK") or reliability < 65.0
+        if need_lab:
+            lab_recommendation = (
+                f"{zone_id} zonasından hədəfli torpaq nümunəsi götürülüb pH, EC və aktiv azot "
+                f"üzrə laborator yoxlama aparılmalıdır (son lab analizindən {int(curr['days_since_lab'])} gün keçib)."
+            )
+        else:
+            lab_recommendation = f"{zone_id} üzrə əlavə laboratoriya nümunəsinə təcili ehtiyac yoxdur."
+
+        # Fermer üçün anlaşılan, amma məzmunlu qısa video/brifinq mətni
+        if lab_mandatory_before_action:
+            action_line = (
+                "Birbaşa kimyəvi gübrə/düzəliş verməzdən əvvəl bu zonadan laboratoriya "
+                "nümunəsi götürün və rütubət/duzluluq balansını dəqiqləşdirin."
+            )
+        else:
+            action_line = (
+                "Zonanı növbəti peyk dövründə izləyin və yalnız ehtiyac olan nöqtəyə lokal aqrotexniki qulluq tətbiq edin."
+            )
+
+        video_script = (
+            f"[{zone_id} | {base['date'].strftime('%d.%m')}–{curr['date'].strftime('%d.%m')}] "
+            f"Bitki örtüyü indeksi (NDVI) {d_ndvi:+.3f}, rütubət {d_moist:+.1f}%, pH {curr['ph']}, EC {curr['ec_ds_m']} dS/m. "
+            f"Risk səviyyəsi: {risk_status}. Model etibarlılığı: {reliability}%. {action_line}"
+        )
+
+        outputs.append({
+            "zone_id": zone_id,
+            "period": f"{base['date'].strftime('%Y-%m-%d')} -> {curr['date'].strftime('%Y-%m-%d')}",
+            "delta_ndvi": d_ndvi,
+            "delta_ph": d_ph,
+            "delta_ec": d_ec,
+            "risk_status": risk_status,
+            "signals": signals,
+            "reliability_pct": reliability,
+            "lab_required": need_lab,
+            "block_unverified_chemical_action": lab_mandatory_before_action,
+            "lab_recommendation": lab_recommendation,
+            "video_brief_script": video_script
+        })
+
+    return outputs
 
 st.sidebar.header(sidebar_title)
 mode = st.sidebar.radio(mode_label, [mode_r, mode_m])
@@ -158,6 +262,92 @@ if st.sidebar.button(btn_label, type="primary"):
         "Dəyər": [ph * 10, nitrogen, ndvi * 100, moisture]
     })
     st.bar_chart(chart_data.set_index("Parametr"))
+        # --- C.h.e.MartixAZE QƏRAR, RİSK VƏ VİDEO XÜLASƏ MODULU ---
+    st.divider()
+
+    zone_name = "Manual_Input" if mode == mode_b else selected_reg
+    base_ec = round(float(reg_info.get("ec", 1.3)), 2) if isinstance(reg_info, dict) else 1.3
+    base_days_lab = 35 if mode == mode_b else 12
+    base_cloud = 12
+
+    # Zaman müqayisəsi üçün bazis + cari ölçüm qeydləri
+    records = [
+        {
+            "zone_id": zone_name,
+            "date": "2026-10-15",
+            "ndvi": round(max(min(float(ndvi) + 0.08, 0.95), 0.05), 3),
+            "soil_moisture": round(min(float(moisture) + 3.0, 95.0), 1),
+            "ph": round(float(reg_info.get("ph", ph)) if isinstance(reg_info, dict) else float(ph), 2),
+            "ec_ds_m": base_ec,
+            "days_since_lab": max(base_days_lab - 15, 1),
+            "cloud_cover": max(base_cloud - 4, 0),
+        },
+        {
+            "zone_id": zone_name,
+            "date": "2026-11-21",
+            "ndvi": round(float(ndvi), 3),
+            "soil_moisture": round(float(moisture), 1),
+            "ph": round(float(ph), 2),
+            "ec_ds_m": round(max(base_ec + (0.9 if float(ph) > 7.8 or float(ph) < 5.5 else 0.2), 0.2), 2),
+            "days_since_lab": base_days_lab,
+            "cloud_cover": base_cloud,
+        },
+    ]
+
+    decision_results = run_chematrix_decision_engine(records)
+    res = decision_results[0]
+
+    sec_title = (
+        "🧪 Kimyəvi Dinamika, Risk Siqnalı və Fermer Video Xülasəsi"
+        if lang == "Azərbaycan"
+        else "🧪 Chemical Dynamics, Risk Signal & Farmer Video Brief"
+    )
+    st.subheader(sec_title)
+
+    c1, c2, c3 = st.columns(3)
+    c1.metric(
+        "Risk Səviyyəsi" if lang == "Azərbaycan" else "Risk Level",
+        res["risk_status"],
+        delta=f"ΔpH: {res['delta_ph']:+.2f} | ΔNDVI: {res['delta_ndvi']:+.3f}",
+    )
+    c2.metric(
+        "Sİ Etibarlılığı" if lang == "Azərbaycan" else "AI Reliability",
+        f"{res['reliability_pct']}%",
+    )
+    c3.metric(
+        "Lab Nümunəsi" if lang == "Azərbaycan" else "Lab Sampling",
+        ("Lazımdır" if lang == "Azərbaycan" else "Required")
+        if res["lab_required"]
+        else ("Vacib deyil" if lang == "Azərbaycan" else "Not urgent"),
+    )
+
+    st.progress(min(max(res["reliability_pct"] / 100.0, 0.0), 1.0))
+
+    if res["signals"]:
+        st.caption(
+            ("Qeydə alınan siqnallar: " if lang == "Azərbaycan" else "Detected signals: ")
+            + ", ".join(res["signals"])
+        )
+
+    if res["block_unverified_chemical_action"]:
+        st.warning(
+            "⚠️ Laborator analiz təsdiqi olmadan gübrə və ya kimyəvi düzəliş tətbiq etməyin! "
+            if lang == "Azərbaycan"
+            else "⚠️ Do not apply fertilizers or chemical corrections without lab verification! "
+        )
+
+    st.info(
+        ("🔬 Laboratoriya tövsiyəsi: " if lang == "Azərbaycan" else "🔬 Lab recommendation: ")
+        + res["lab_recommendation"]
+    )
+
+    st.markdown(
+        "🎬 **Fermer üçün qısa video/brifinq xülasəsi:**"
+        if lang == "Azərbaycan"
+        else "🎬 **Farmer Short Video/Brief Script:**"
+    )
+    st.write(res["video_brief_script"])
+
 else:
     st.info(info_start)
 
