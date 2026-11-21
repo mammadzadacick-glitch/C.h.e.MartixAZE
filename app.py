@@ -291,9 +291,6 @@ if st.sidebar.button(btn_label, type="primary"):
             "cloud_cover": base_cloud,
         },
     ]
-
-    ]
-
     decision_results = run_chematrix_decision_engine(records)
     res = decision_results[0]
 
