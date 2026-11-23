@@ -177,11 +177,8 @@ REGIONS = {
 }
 
 CROPS = {
-        "Pomidor": {
-        "opt_ph": (6.0, 6.8),
-        "cost_ha": 2400,
-        "rev_ha": 5200,
-        "conf": 91.4,
+    "Pomidor": {
+        "opt_ph": (6.0, 6.8), "cost_ha": 2400, "rev_ha": 5200, "conf": 91.4,
         "history": [28, 30, 29, 32, 34, 33, 36, 38, 37, 41],
         "advice": "Bu il Pomidor əkini məsləhətdir — torpaq pH və rütubət balansı əlverişlidir.",
         "steps": [
@@ -189,7 +186,58 @@ CROPS = {
             "2. Çiçəkləmə dövründə Kalium-fosfat gübrəsi tətbiq edin (+9% məhsul).",
             "3. Peyk xəritəsində zəif görünən zonalara lokal azot verin (+6% qənaət)."
         ]
+    },
+    "Pambıq": {
+        "opt_ph": (6.5, 7.8), "cost_ha": 1650, "rev_ha": 3450, "conf": 87.8,
+        "history": [2.4, 2.5, 2.7, 2.6, 2.9, 3.1, 3.0, 3.3, 3.4, 3.6],
+        "advice": "İsti və balanslı sahələrdə bu il Pambıq əkini məsləhətdir.",
+        "steps": [
+            "1. Səpinqabağı duzluluğu nəzarətdə saxlayın.",
+            "2. Qönçələmə fazasında azot gübrəsini iki hissəyə bölün (+12% məhsul).",
+            "3. Yığım zamanı məhsul itkisini minimuma endirin."
+        ]
+    },
+    "Turp": {
+        "opt_ph": (5.8, 6.8), "cost_ha": 950, "rev_ha": 2350, "conf": 93.2,
+        "history": [16, 17, 16.5, 18, 19, 18.5, 20, 21, 21.5, 23],
+        "advice": "Qısa müddətdə stabil dövriyyə üçün bu il Turp əkini məsləhətdir.",
+        "steps": [
+            "1. Yumşaq və daşsız torpaq hazırlayın.",
+            "2. Həddindən artıq azotdan çəkinin.",
+            "3. Müntəzəm səhər suvarması ilə keyfiyyəti artırın (+15% gəlir)."
+        ]
+    },
+    "Buğda": {
+        "opt_ph": (6.0, 7.5), "cost_ha": 780, "rev_ha": 1680, "conf": 89.5,
+        "history": [3.1, 3.2, 3.0, 3.4, 3.5, 3.3, 3.7, 3.8, 3.9, 4.2],
+        "advice": "Geniş sahələrdə sabit və etibarlı nəticə üçün bu il Buğda əkini məsləhətdir.",
+        "steps": [
+            "1. Kollanma dövründə rütubətə uyğun azot verin.",
+            "2. Alaq otlarına qarşı erkən mübarizə aparın (+11% məhsul).",
+            "3. Dən dolma fazasında mikroelement çiləməsi edin."
+        ]
+    },
+    "Kartof": {
+        "opt_ph": (5.5, 6.5), "cost_ha": 2700, "rev_ha": 5800, "conf": 90.1,
+        "history": [19, 20, 21, 20.5, 22, 23, 24, 23.5, 25, 27],
+        "advice": "Zəif turşulu və mülayim torpaqlarda bu il Kartof əkini məsləhətdir.",
+        "steps": [
+            "1. Keyfiyyətli toxumluq yumrulardan istifadə edin.",
+            "2. Dibdoldurma işini vaxtında görün (+13% məhsul).",
+            "3. Kalium gübrəsi ilə saxlanma müddətini artırın."
+        ]
+    },
+    "Qarğıdalı": {
+        "opt_ph": (5.8, 7.0), "cost_ha": 1350, "rev_ha": 3100, "conf": 88.6,
+        "history": [5.8, 6.0, 6.2, 6.1, 6.5, 6.8, 6.7, 7.1, 7.3, 7.6],
+        "advice": "Suvarma imkanı olan sahələrdə bu il Qarğıdalı əkini məsləhətdir.",
+        "steps": [
+            "1. 6–8 yarpaq mərhələsində cərgəarası becərmə edin.",
+            "2. Saçaqlama dövründə su stresinə yol verməyin.",
+            "3. Bitki sıxlığını optimal saxlayın."
+        ]
     }
+}
 
         "opt_ph": (6.0, 6.8), "cost_ha": 2400, "rev_ha": 5200, "conf": 91.4,
         "history": [28, 30, 29, 32, 34, 33, 36, 38, 37, 41],
