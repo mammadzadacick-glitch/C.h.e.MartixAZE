@@ -181,6 +181,6 @@ CROPS = {
         "opt_ph": (6.0, 6.8), "cost_ha": 2400, "rev_ha": 5200, "conf": 91.4,
         "history": [28, 30, 29, 32, 34, 33, 36, 38, 37, 41],
         "advice": "Bu il Pomidor əkini məsləhətdir — torpaq pH və rütubət balansı əlverişlidir.",
-        "steps": [
+        "steps": 
         "1. Damcı suvarma ilə rütubəti 35–40% aralığında saxlayın (+14% məhsul).",
 
