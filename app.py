@@ -182,4 +182,5 @@ CROPS = {
         "history": [28, 30, 29, 32, 34, 33, 36, 38, 37, 41],
         "advice": "Bu il Pomidor əkini məsləhətdir — torpaq pH və rütubət balansı əlverişlidir.",
         "steps": [
-            "1. Damcı suvarma ilə rütub
+        "1. Damcı suvarma ilə rütubəti 35–40% aralığında saxlayın (+14% məhsul).",
+
