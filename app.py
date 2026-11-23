@@ -141,7 +141,12 @@ button[kind="secondary"]:hover *, button[kind="primary"]:hover *, .stButton > bu
 """, unsafe_allow_html=True)
 
 REGIONS = {
-    "Abşeron": {
+        "Bakı": {
+        "lat": 40.4093, "lon": 49.8671, "zone": "Abşeron-Bakı aqro-ekoloji və şəhərətrafı təsərrüfat zonası",
+        "ph": 7.6, "n": 34, "ndvi": 0.50, "moisture": 20,
+        "prev_ph": 7.7, "prev_yield": 2.7, "curr_yield": 3.0
+    },
+     "Abşeron": {
         "lat": 40.4614, "lon": 49.7364, "zone": "Abşeron yarımadası və zeytun/badam-tərəvəz monitorinq zonası",
         "ph": 7.7, "n": 32, "ndvi": 0.48, "moisture": 19,
         "prev_ph": 7.8, "prev_yield": 2.6, "curr_yield": 2.9
