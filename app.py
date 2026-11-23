@@ -1,352 +1,327 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import json
+import plotly.graph_objects as go
+import folium
+from streamlit_folium import st_folium
+import os
 
-# Səhifə konfiqurasiyası
+# ---------------------------------------------------------
+# 1. SƏHİFƏ KONFİQURASİYASI
+# ---------------------------------------------------------
 st.set_page_config(
-    page_title="C.h.e.MartixAZE v3.0 Final",
-    page_icon="logo.png",
-    layout="wide"
+    page_title="C.h.e.MartixAZE | Cyber-Agro AI Platform",
+    page_icon="🌱",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
-# --- PWA (MOBILE APP) QABIĞI ---
-manifest_data = {
-    "name": "C.h.e.MartixAZE",
-    "short_name": "MartixAZE",
-    "start_url": "./",
-    "display": "standalone",
-    "background_color": "#0e1117",
-    "theme_color": "#0e1117",
-    "icons": [
-        {"src": "logo.png", "sizes": "192x192", "type": "image/png"},
-        {"src": "logo.png", "sizes": "512x512", "type": "image/png"},
-    ],
+# ---------------------------------------------------------
+# 2. QARA VƏ FOSFOR YAŞILI (CYBER-AGRO) DİZAYN + ŞRİFTLƏR
+# ---------------------------------------------------------
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+:root {
+    --bg-dark: #050806;
+    --card-bg: #0c140f;
+    --neon-green: #39ff14;
+    --neon-cyan: #00d4ff;
+    --border-glow: rgba(57, 255, 20, 0.35);
+    --text-main: #e8f5e9;
+    --text-muted: #9eb3a2;
 }
 
-manifest_json = json.dumps(manifest_data)
-
-pwa_code = f"""
-<link rel="manifest" href='data:application/manifest+json;charset=utf-8,{manifest_json}'>
-"""
-st.markdown(pwa_code, unsafe_allow_html=True)
-
-# --- DİL SEÇİMİ ---
-st.sidebar.title("🌍 Parametrlər / Settings")
-lang = st.sidebar.selectbox("Dil / Language", ["Azərbaycan", "English"])
-
-# --- TƏRCÜMƏLƏR ---
-if lang == "Azərbaycan":
-    title_text = "🌱 C.h.e.MartixAZE: Süni İntellektlə Torpaq və Ekosistem İdarəetməsi"
-    subtitle_text = "NASA peyk məlumatları və aqrokimyəvi modelləşdirmə əsasında qərar qəbuletmə platforması."
-    sidebar_title = "🎛️ Analiz Parametrləri"
-    mode_label = "Məlumat Mənbəyi"
-    mode_r = "Rayon Seçimi (NASA Peyk + Baza)"
-    mode_m = "Manual Daxiletmə (Sürüşdürücülər)"
-    reg_select_label = "Tədqiqat Bölgəsini Seçin:"
-    ph_label = "Torpağın pH səviyyəsi"
-    n_label = "Azot (N) miqdarı (mq/kq)"
-    ndvi_label = "NASA Peyk NDVI İndeksi"
-    moist_label = "Torpağın Rütubəti (%)"
-    btn_label = "🚀 AI Analiz və Proqnoz Başlat"
-    map_title = "🛰️ NASA Peyk və Monitorinq Xəritəsi"
-    map_caption = "Seçilmiş regionun peyk müşahidə koordinatları."
-    res_title = "📊 Süni İntellekt Təhlil Nəticələri"
-    pred_title = "🔮 Predictive AI: 14 Günlük Proqnoz"
-    rec_heading = "🧪 Mühəndislik və Gübrə Tövsiyələri"
-    chart_title = "📈 Parametrlərin Müqayisəli Diaqramı"
-    ok_text = "✅ Ekosistem Stabil: Torpaq kimyası optimal balansdadır."
-    warn_text = "⚠️ Kritik Balanssızlıq: Torpaq deqradasiyası riski var!"
-    info_reg = "📍 NASA verilənləri və regional baza yükləndi."
-    info_start = "👈 Təhlil üçün sol paneldən bölgəni seçin və düyməyə basın."
-    footer_text = "Hazırladı: Çiçək Məmmədzadə | C.h.e.MartixAZE © 2026"
-else:
-    title_text = "🌱 C.h.e.MartixAZE: AI-Driven Soil & Ecosystem Management"
-    subtitle_text = "Decision-making platform powered by NASA satellite telemetry and agrochemical modeling."
-    sidebar_title = "🎛️ Analysis Parameters"
-    mode_label = "Data Source"
-    mode_r = "Region Selection (NASA Satellite + Database)"
-    mode_m = "Manual Input (Sliders)"
-    reg_select_label = "Select Research Region:"
-    ph_label = "Soil pH Level"
-    n_label = "Nitrogen (N) Content (mg/kg)"
-    ndvi_label = "NASA Satellite NDVI"
-    moist_label = "Soil Moisture (%)"
-    btn_label = "🚀 Run AI Analysis & Forecast"
-    map_title = "🛰️ NASA Satellite & Monitoring Map"
-    map_caption = "Displaying satellite observation coordinates."
-    res_title = "📊 AI Analysis Results"
-    pred_title = "🔮 Predictive AI: 14-Day Forecast"
-    rec_heading = "🧪 Precision Agrochemical Recommendations"
-    chart_title = "📈 Comparative Parameter Distribution"
-    ok_text = "✅ Ecosystem Stable: Soil chemistry is within optimal balance."
-    warn_text = "⚠️ Critical Imbalance: Soil degradation risk detected!"
-    info_reg = "📍 NASA satellite telemetry and regional baseline loaded."
-    info_start = "👈 Select a region from the sidebar and click the button."
-    footer_text = "Developed by: Çiçək Məmmədzadə | C.h.e.MartixAZE © 2026"
-
-st.title(title_text)
-st.write(subtitle_text)
-st.markdown("---")
-
-# --- REGİONAL BAZA ---
-regions_data = {
-    "Oğuz": {"ph": 6.2, "n": 48.0, "ndvi": 0.74, "moisture": 35.0, "lat": 41.0714, "lon": 47.4653},
-    "Bakı / Abşeron": {"ph": 7.9, "n": 21.0, "ndvi": 0.29, "moisture": 14.0, "lat": 40.4093, "lon": 49.8671},
-    "Gəncə-Qazax": {"ph": 7.1, "n": 38.0, "ndvi": 0.58, "moisture": 25.0, "lat": 40.6828, "lon": 46.3606},
-    "Aran Bölgəsi": {"ph": 7.6, "n": 28.0, "ndvi": 0.42, "moisture": 18.0, "lat": 40.3453, "lon": 48.1508},
-    "Lənkəran-Astara": {"ph": 5.6, "n": 52.0, "ndvi": 0.81, "moisture": 44.0, "lat": 38.7543, "lon": 48.8506}
+.stApp {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Space Grotesk', sans-serif;
 }
-import pandas as pd
-import numpy as np
 
+h1, h2, h3, .cyber-title {
+    font-family: 'Orbitron', sans-serif !important;
+    color: var(--neon-green) !important;
+    text-shadow: 0 0 12px rgba(57, 255, 20, 0.45);
+    letter-spacing: 0.6px;
+}
 
-def run_chematrix_decision_engine(records: list[dict]) -> list[dict]:
-    """
-    C.h.e.MartixAZE üçün:
-    1. Zaman üzrə kimyəvi/spektral dəyişiklik müqayisəsi
-    2. pH, EC və NDVI əsaslı risk siqnalı
-    3. Lab nümunəsi üçün ağıllı zona seçimi
-    4. Sİ etibarlılıq göstəricisi və riskli qərar xəbərdarlığı
-    5. Fermer üçün aydın + analitik video/brifinq ssenarisi
-    """
-    df = pd.DataFrame(records)
-    df["date"] = pd.to_datetime(df["date"])
-    outputs = []
+/* Sol Panel (Sidebar) */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #070d09 0%, #0b1610 100%);
+    border-right: 1px solid var(--border-glow);
+}
 
-    for zone_id, group in df.groupby("zone_id"):
-        g = group.sort_values("date").reset_index(drop=True)
-        base = g.iloc[0]
-        curr = g.iloc[-1]
+/* Göy rəngli direkt giriş düymələri (Sol paneldə) */
+.nav-box {
+    display: block;
+    background: linear-gradient(90deg, #003566, #0077b6);
+    color: #ffffff !important;
+    padding: 9px 12px;
+    margin-bottom: 7px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    font-weight: 700;
+    font-size: 13.5px;
+    border: 1px solid #00b4d8;
+    box-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
+    transition: all 0.2s ease;
+}
+.nav-box:hover {
+    background: #0096c7;
+    transform: translateX(4px);
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.7);
+}
 
-        # 1. Zaman xəritəsi fərqləri
-        d_ndvi = round(float(curr["ndvi"] - base["ndvi"]), 3)
-        d_ph = round(float(curr["ph"] - base["ph"]), 2)
-        d_ec = round(float(curr["ec_ds_m"] - base["ec_ds_m"]), 2)
-        d_moist = round(float(curr["soil_moisture"] - base["soil_moisture"]), 1)
+/* Kartlar və Bölmə Ayırıcıları */
+.cyber-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-glow);
+    border-left: 4px solid var(--neon-green);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.65);
+}
 
-        # 2. Risk siqnalı (pH + EC + NDVI)
-        risk_points = 0
-        signals = []
+.badge-neon {
+    display: inline-block;
+    background: rgba(57, 255, 20, 0.14);
+    color: var(--neon-green);
+    border: 1px solid var(--neon-green);
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
 
-        if curr["ph"] < 5.5 or curr["ph"] > 7.8 or abs(d_ph) >= 0.7:
-            risk_points += 40
-            signals.append(f"pH dəyişimi/həddi ({base['ph']} → {curr['ph']})")
+/* Metrik rəqəmlərinin kəsilməməsi üçün */
+[data-testid="stMetricValue"] {
+    color: var(--neon-green) !important;
+    font-family: 'Orbitron', sans-serif !important;
+    font-size: 24px !important;
+    white-space: nowrap !important;
+}
+[data-testid="stMetricLabel"] {
+    color: var(--text-muted) !important;
+    font-size: 13px !important;
+}
 
-        if curr["ec_ds_m"] >= 2.5 or d_ec >= 1.0:
-            risk_points += 40
-            signals.append(f"EC/duzluluq artımı ({base['ec_ds_m']} → {curr['ec_ds_m']} dS/m)")
+/* Düymələr */
+.stButton > button {
+    background: linear-gradient(90deg, #1b4332, #2d6a4f);
+    color: #39ff14 !important;
+    border: 1px solid #39ff14 !important;
+    font-weight: 700;
+    border-radius: 8px;
+    width: 100%;
+}
+.stButton > button:hover {
+    background: #39ff14 !important;
+    color: #050806 !important;
+}
 
-        if d_ndvi <= -0.15:
-            risk_points += 20
-            signals.append(f"NDVI enişi ({d_ndvi})")
+/* Nino AI sağ panel stili */
+.nino-box {
+    background: #08120c;
+    border: 1.5px solid #39ff14;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 0 18px rgba(57, 255, 20, 0.25);
+}
+</style>
+""", unsafe_allow_html=True)
 
-        if risk_points >= 60:
-            risk_status = "YÜKSƏK RİSK"
-        elif risk_points >= 30:
-            risk_status = "ORTA RİSK"
-        else:
-            risk_status = "NORMAL"
+# ---------------------------------------------------------
+# 3. BAZA MƏLUMATLARI (RAYONLAR VƏ BİTKİLƏR)
+# ---------------------------------------------------------
+REGIONS = {
+    "Oğuz": {"lat": 41.0714, "lon": 47.4653, "ph": 6.2, "n": 48, "ndvi": 0.74, "moisture": 35, "ec": 1.5, "prev_ph": 6.0, "prev_yield": 4.2, "curr_yield": 4.8},
+    "Şəki": {"lat": 41.1919, "lon": 47.1706, "ph": 6.5, "n": 52, "ndvi": 0.71, "moisture": 32, "ec": 1.4, "prev_ph": 6.4, "prev_yield": 4.0, "curr_yield": 4.5},
+    "Qəbələ": {"lat": 40.9814, "lon": 47.8458, "ph": 6.1, "n": 55, "ndvi": 0.78, "moisture": 39, "ec": 1.3, "prev_ph": 5.9, "prev_yield": 4.6, "curr_yield": 5.1},
+    "Sabirabad": {"lat": 40.0087, "lon": 48.4770, "ph": 7.6, "n": 34, "ndvi": 0.56, "moisture": 22, "ec": 2.8, "prev_ph": 7.8, "prev_yield": 3.1, "curr_yield": 3.4},
+    "Gəncə-Göygöl": {"lat": 40.5855, "lon": 46.3189, "ph": 6.8, "n": 45, "ndvi": 0.68, "moisture": 30, "ec": 1.7, "prev_ph": 6.7, "prev_yield": 3.9, "curr_yield": 4.3},
+    "Lənkəran": {"lat": 38.7543, "lon": 48.8506, "ph": 5.8, "n": 60, "ndvi": 0.81, "moisture": 44, "ec": 1.2, "prev_ph": 5.7, "prev_yield": 4.9, "curr_yield": 5.4},
+}
 
-        # 4. Etibarlılıq göstəricisi (%)
-        reliability = 100.0
-        reliability -= min(float(curr["days_since_lab"]) * 0.65, 45.0)
-        reliability -= min(float(curr["cloud_cover"]) * 0.75, 25.0)
-        if abs(d_ph) >= 0.8 or d_ec >= 1.5:
-            reliability -= 15.0  # Kəskin dəyişiklikdə model təkbaşına tam etibarlı sayılmır
+CROPS = {
+    "Pomidor (Tomato)": {
+        "opt_ph": (6.0, 6.8), "cost_ha": 2400, "rev_ha": 5200, "conf": 91.4,
+        "history": [28, 30, 29, 32, 34, 33, 36, 38, 37, 41],
+        "advice": "Bu il torpağın pH və rütubət balansı Pomidor əkini üçün çox əlverişlidir.",
+        "steps": [
+            "1. Damcı suvarma ilə rütubəti 35–40% aralığında sabit saxlayın (+14% məhsul).",
+            "2. Çiçəkləmə dövründə Kalium-fosfat gübrəsi tətbiq edin (+9% məhsul).",
+            "3. NASA NDVI xəritəsində zəif görünən kənar cərgələrə lokal azot verin (+6% qənaət)."
+        ]
+    },
+    "Pambıq (Cotton)": {
+        "opt_ph": (6.5, 7.8), "cost_ha": 1650, "rev_ha": 3450, "conf": 87.8,
+        "history": [2.4, 2.5, 2.7, 2.6, 2.9, 3.1, 3.0, 3.3, 3.4, 3.6],
+        "advice": "Orta-isti və neytral/zəif qələvi torpaqlarda Pambıq əkini yüksək gəlir vəd edir.",
+        "steps": [
+            "1. Səpinqabağı torpaq duzluluğunu (EC) yuyulma ilə 2.0 dS/m-dən aşağı salın.",
+            "2. Qönçələmə mərhələsində Karbamid dozalarını 2 mərhələyə bölün (+12% məhsul).",
+            "3. Məhsul yığımından 15 gün əvvəl defoliasiya tətbiq edərək itkini azaldın."
+        ]
+    },
+    "Turp (Radish)": {
+        "opt_ph": (5.8, 6.8), "cost_ha": 950, "rev_ha": 2350, "conf": 93.2,
+        "history": [16, 17, 16.5, 18, 19, 18.5, 20, 21, 21.5, 23],
+        "advice": "Qısa vegetasiya dövrü və sürətli dövriyyə üçün Turp əkini bu il tövsiyə olunur.",
+        "steps": [
+            "1. Yumşaq və daşsız şum qatı hazırlayın ki, kökümeyvələr deformasiya olmasın.",
+            "2. Həddindən artıq azotdan qaçın (yarpaq böyüyər, kök kiçik qalar).",
+            "3. Müntəzəm səhər suvarması ilə acılaşmanın qarşısını alın (+15% bazar dəyəri)."
+        ]
+    },
+    "Buğda (Wheat)": {
+        "opt_ph": (6.0, 7.5), "cost_ha": 780, "rev_ha": 1680, "conf": 89.5,
+        "history": [3.1, 3.2, 3.0, 3.4, 3.5, 3.3, 3.7, 3.8, 3.9, 4.2],
+        "advice": "Geniş sahələrdə stabil və az riskli gəlir üçün payızlıq/yazlıq Buğda məsləhətdir.",
+        "steps": [
+            "1. Kollanma fazasında ammonium-nitrat tətbiqini peyk rütubət proqnozuna uyğunlaşdırın.",
+            "2. Alaq otlarına qarşı erkən herbisid müdaxiləsi məhsuldarlığı +11% artırır.",
+            "3. Dən dolma dövründə yarpaqdan mikroelement çiləməsi aparın."
+        ]
+    },
+    "Kartof (Potato)": {
+        "opt_ph": (5.5, 6.5), "cost_ha": 2700, "rev_ha": 5800, "conf": 90.1,
+        "history": [19, 20, 21, 20.5, 22, 23, 24, 23.5, 25, 27],
+        "advice": "Zəif turşulu (pH 5.8–6.4) dağətəyi torpaqlarda Kartof maksimum gəlir verir.",
+        "steps": [
+            "1. Sertifikatlı toxumluq yumrulardan istifadə edərək xəstəlik riskini 40% azaldın.",
+            "2. Doldurma (dibdoldurma) əməliyyatını vaxtında aparın (+13% məhsul).",
+            "3. Kalium sulfat gübrəsi ilə nişasta faizini və saxlanma müddətini artırın."
+        ]
+    },
+    "Qarğıdalı (Corn)": {
+        "opt_ph": (5.8, 7.0), "cost_ha": 1350, "rev_ha": 3100, "conf": 88.6,
+        "history": [5.8, 6.0, 6.2, 6.1, 6.5, 6.8, 6.7, 7.1, 7.3, 7.6],
+        "advice": "Suvarma imkanı olan sahələrdə Qarğıdalı yüksək rentabellik göstərir.",
+        "steps": [
+            "1. 6–8 yarpaq fazasında cərgəarası kultivasiya və azot yemləməsi edin.",
+            "2. Saçaqlama dövründə su stresinə yol verməyin (bu mərhələdə məhsulun 50%-i formalaşır).",
+            "3. Sıxlığı hektara 65–70 min bitki səviyyəsində tənzimləyin."
+        ]
+    }
+}
 
-        reliability = round(max(min(reliability, 98.0), 15.0), 1)
-        lab_mandatory_before_action = reliability < 65.0 or risk_status == "YÜKSƏK RİSK"
+# ---------------------------------------------------------
+# 4. SOL TƏRƏF: İSTİFADƏ PANELİ, AXTARIŞ VƏ GÖY DİREKT QUTUCUQLAR
+# ---------------------------------------------------------
+with st.sidebar:
+    st.markdown("## 🌱 C.h.e.MartixAZE")
+    st.caption("NASA Peyk + Aqrokimya Sİ Platforması")
 
-        # 3. Laboratoriya yoxlaması üçün ağıllı seçim
-        need_lab = risk_status in ("YÜKSƏK RİSK", "ORTA RİSK") or reliability < 65.0
-        if need_lab:
-            lab_recommendation = (
-                f"{zone_id} zonasından hədəfli torpaq nümunəsi götürülüb pH, EC və aktiv azot "
-                f"üzrə laborator yoxlama aparılmalıdır (son lab analizindən {int(curr['days_since_lab'])} gün keçib)."
-            )
-        else:
-            lab_recommendation = f"{zone_id} üzrə əlavə laboratoriya nümunəsinə təcili ehtiyac yoxdur."
+    search_query = st.text_input("🔍 Bölmə və ya funksiya axtar...", placeholder="Məs: pH, Nino, Gəlir, Bitki...")
 
-        # Fermer üçün anlaşılan, amma məzmunlu qısa video/brifinq mətni
-        if lab_mandatory_before_action:
-            action_line = (
-                "Birbaşa kimyəvi gübrə/düzəliş verməzdən əvvəl bu zonadan laboratoriya "
-                "nümunəsi götürün və rütubət/duzluluq balansını dəqiqləşdirin."
-            )
-        else:
-            action_line = (
-                "Zonanı növbəti peyk dövründə izləyin və yalnız ehtiyac olan nöqtəyə lokal aqrotexniki qulluq tətbiq edin."
-            )
-
-        video_script = (
-            f"[{zone_id} | {base['date'].strftime('%d.%m')}–{curr['date'].strftime('%d.%m')}] "
-            f"Bitki örtüyü indeksi (NDVI) {d_ndvi:+.3f}, rütubət {d_moist:+.1f}%, pH {curr['ph']}, EC {curr['ec_ds_m']} dS/m. "
-            f"Risk səviyyəsi: {risk_status}. Model etibarlılığı: {reliability}%. {action_line}"
-        )
-
-        outputs.append({
-            "zone_id": zone_id,
-            "period": f"{base['date'].strftime('%Y-%m-%d')} -> {curr['date'].strftime('%Y-%m-%d')}",
-            "delta_ndvi": d_ndvi,
-            "delta_ph": d_ph,
-            "delta_ec": d_ec,
-            "risk_status": risk_status,
-            "signals": signals,
-            "reliability_pct": reliability,
-            "lab_required": need_lab,
-            "block_unverified_chemical_action": lab_mandatory_before_action,
-            "lab_recommendation": lab_recommendation,
-            "video_brief_script": video_script
-        })
-
-    return outputs
-
-st.sidebar.header(sidebar_title)
-mode = st.sidebar.radio(mode_label, [mode_r, mode_m])
-
-if mode == mode_r:
-    selected_reg = st.sidebar.selectbox(reg_select_label, list(regions_data.keys()))
-    reg_vals = regions_data[selected_reg]
-    ph, nitrogen, ndvi, moisture = reg_vals["ph"], reg_vals["n"], reg_vals["ndvi"], reg_vals["moisture"]
-    lat, lon = reg_vals["lat"], reg_vals["lon"]
-    st.sidebar.info(info_reg)
-else:
-    ph = st.sidebar.slider(ph_label, 4.0, 10.0, 6.5)
-    nitrogen = st.sidebar.slider(n_label, 10.0, 100.0, 45.0)
-    ndvi = st.sidebar.slider(ndvi_label, 0.0, 1.0, 0.65)
-    moisture = st.sidebar.slider(moist_label, 5.0, 60.0, 28.0)
-    lat, lon = 40.4093, 47.5000
-
-st.subheader(map_title)
-np.random.seed(42)
-map_df = pd.DataFrame({'lat': lat + np.random.normal(0, 0.02, 4), 'lon': lon + np.random.normal(0, 0.02, 4)})
-st.map(map_df, zoom=8)
-st.caption(map_caption)
-st.markdown("---")
-
-if st.sidebar.button(btn_label, type="primary"):
-    st.subheader(res_title)
-    
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("pH Level", f"{ph}")
-    col2.metric("Nitrogen (N)", f"{nitrogen} mg/kg")
-    col3.metric("NASA NDVI", f"{ndvi}")
-    col4.metric("Moisture", f"{moisture}%")
-    
-    st.markdown("---")
-    if 6.0 <= ph <= 7.4 and nitrogen >= 38 and ndvi >= 0.50:
-        st.success(ok_text)
-    else:
-        st.warning(warn_text)
-    
-    col_left, col_right = st.columns(2)
-    with col_left:
-        st.markdown(f"### {pred_title}")
-        st.info("📉 14 günlük rütubət və deqradasiya proqnozu sabitdir.")
-        st.success("🌾 Gözlənilən məhsuldarlıq indeksi yüksəkdir.")
-    with col_right:
-        st.markdown(f"### {rec_heading}")
-        if ph > 7.4:
-            st.write("• Qələvi torpaq üçün kükürd (S) tətbiq edin.")
-        elif ph < 6.0:
-            st.write("• Turş torpaq üçün əhəngdaşı ($CaCO_3$) tətbiq edin.")
-        else:
-            st.write("• pH optimal səviyyədədir.")
-        st.write("• Karbamid və damcı suvarma rejimi tövsiyə olunur.")
-
-    st.markdown("---")
-    st.markdown(f"### {chart_title}")
-    chart_data = pd.DataFrame({
-        "Parametr": ["pH (x10)", "Azot (N)", "NDVI (x100)", "Rütubət (%)"],
-        "Dəyər": [ph * 10, nitrogen, ndvi * 100, moisture]
-    })
-    st.bar_chart(chart_data.set_index("Parametr"))
-        # --- C.h.e.MartixAZE QƏRAR, RİSK VƏ VİDEO XÜLASƏ MODULU ---
-    st.divider()
-
-    zone_name = "Manual_Input" if "Manual" in str(mode) or "Manuel" in str(mode) else selected_reg
-    base_ec = 1.3
-    base_days_lab = 35 if "Manual" in str(mode) or "Manuel" in str(mode) else 12
-    base_cloud = 12
-    records = [
-        {
-            "zone_id": zone_name,
-            "date": "2026-10-15",
-            "ndvi": round(max(min(float(ndvi) + 0.08, 0.95), 0.05), 3),
-            "soil_moisture": round(min(float(moisture) + 3.0, 95.0), 1),
-            "ph": round(float(ph), 2),
-            "ec_ds_m": base_ec,
-            "days_since_lab": max(base_days_lab - 15, 1),
-            "cloud_cover": max(base_cloud - 4, 0),
-        },
-        {
-            "zone_id": zone_name,
-            "date": "2026-11-21",
-            "ndvi": round(float(ndvi), 3),
-            "soil_moisture": round(float(moisture), 1),
-            "ph": round(float(ph), 2),
-            "ec_ds_m": round(max(base_ec + (0.9 if float(ph) > 7.8 or float(ph) < 5.5 else 0.2), 0.2), 2),
-            "days_since_lab": base_days_lab,
-            "cloud_cover": base_cloud,
-        },
+    st.markdown("### 🧭 Sürətli Keçid (Direkt Giriş)")
+    nav_items = [
+        ("🎬 45 san. Təlimat Video Çarxı", "#video-guide"),
+        ("🛰️ NASA Peyk Xəritəsi", "#satellite-map"),
+        ("🧪 pH və Torpaq Kimyası Analizi", "#soil-metrics"),
+        ("📈 10 İllik Torpaq Məhsuldarlığı", "#soil-10yr"),
+        ("🌾 Bitki Seçimi & 10 İllik Qrafik", "#crop-selector"),
+        ("💰 Gəlir, Xərc və Qazanc Planı", "#profit-calc"),
+        ("⚖️ Keçən İllə Müqayisə", "#year-compare"),
+        ("🤖 Nino AI Köməkçi", "#nino-ai"),
     ]
-    decision_results = run_chematrix_decision_engine(records)
-    res = decision_results[0]
 
-    sec_title = (
-        "🧪 Kimyəvi Dinamika, Risk Siqnalı və Fermer Video Xülasəsi"
-        if lang == "Azərbaycan"
-        else "🧪 Chemical Dynamics, Risk Signal & Farmer Video Brief"
-    )
-    st.subheader(sec_title)
+    for label, anchor in nav_items:
+        if not search_query or search_query.lower() in label.lower():
+            st.markdown(f'<a class="nav-box" href="{anchor}">{label}</a>', unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns(3)
-    c1.metric(
-        "Risk Səviyyəsi" if lang == "Azərbaycan" else "Risk Level",
-        res["risk_status"],
-        delta=f"ΔpH: {res['delta_ph']:+.2f} | ΔNDVI: {res['delta_ndvi']:+.3f}",
-    )
-    c2.metric(
-        "Sİ Etibarlılığı" if lang == "Azərbaycan" else "AI Reliability",
-        f"{res['reliability_pct']}%",
-    )
-    c3.metric(
-        "Lab Nümunəsi" if lang == "Azərbaycan" else "Lab Sampling",
-        ("Lazımdır" if lang == "Azərbaycan" else "Required")
-        if res["lab_required"]
-        else ("Vacib deyil" if lang == "Azərbaycan" else "Not urgent"),
-    )
+    st.divider()
+    st.markdown("### ⚙️ Analiz Parametrləri")
+    data_mode = st.radio("Məlumat Mənbəyi:", ["Rayon Seçimi (NASA Peyk + Baza)", "Manual Daxiletmə (Sürüşdürücülər)"])
+    selected_region = st.selectbox("Tədqiqat Bölgəsi:", list(REGIONS.keys()))
 
-    st.progress(min(max(res["reliability_pct"] / 100.0, 0.0), 1.0))
+    reg = REGIONS[selected_region]
+    if data_mode == "Manual Daxiletmə (Sürüşdürücülər)":
+        ph_val = st.slider("Torpaq pH", 4.5, 9.0, float(reg["ph"]), 0.1)
+        n_val = st.slider("Azot (N) mq/kq", 10, 100, int(reg["n"]))
+        ndvi_val = st.slider("NASA NDVI İndeksi", 0.10, 0.95, float(reg["ndvi"]), 0.01)
+        moist_val = st.slider("Torpaq Rütubəti (%)", 5, 80, int(reg["moisture"]))
+    else:
+        ph_val, n_val, ndvi_val, moist_val = reg["ph"], reg["n"], reg["ndvi"], reg["moisture"]
 
-    if res["signals"]:
-        st.caption(
-            ("Qeydə alınan siqnallar: " if lang == "Azərbaycan" else "Detected signals: ")
-            + ", ".join(res["signals"])
-        )
+    st.success(f"🛰️ {selected_region} üzrə NASA peyk datası aktivdir.")
 
-    if res["block_unverified_chemical_action"]:
-        st.warning(
-            "⚠️ Laborator analiz təsdiqi olmadan gübrə və ya kimyəvi düzəliş tətbiq etməyin! "
-            if lang == "Azərbaycan"
-            else "⚠️ Do not apply fertilizers or chemical corrections without lab verification! "
-        )
+# ---------------------------------------------------------
+# 5. ƏSAS EKRAN + SAĞ KÜNCDƏ NİNO AI PANELİ
+# ---------------------------------------------------------
+main_col, nino_col = st.columns([3.1, 1.25], gap="large")
 
-    st.info(
-        ("🔬 Laboratoriya tövsiyəsi: " if lang == "Azərbaycan" else "🔬 Lab recommendation: ")
-        + res["lab_recommendation"]
-    )
+with main_col:
+    st.markdown("""
+    <div class="cyber-card">
+        <span class="badge-neon">NASA SATELLITE + AGRO-CHEMISTRY AI</span>
+        <h1 style="margin-top:8px; margin-bottom:4px;">C.h.e.MartixAZE</h1>
+        <p style="color:#9eb3a2; font-size:15px; margin:0;">
+            Süni İntellekt və peyk verilənləri əsasında torpaq kimyası, 10 illik məhsuldarlıq dinamikası və gəlir optimallaşdırma platforması.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown(
-        "🎬 **Fermer üçün qısa video/brifinq xülasəsi:**"
-        if lang == "Azərbaycan"
-        else "🎬 **Farmer Short Video/Brief Script:**"
-    )
-    st.write(res["video_brief_script"])
+    # BÖLMƏ 1: 45 SANİYƏLİK TƏLİMAT VİDEO ÇARXI
+    st.markdown('<div id="video-guide"></div>', unsafe_allow_html=True)
+    with st.expander("🎬 Bələdçi Video Çarx (45 saniyə): Sayt nə işə yarayır və hara nə daxil edilməlidir?", expanded=True):
+        if os.path.exists("chemartix_guide.mp4"):
+            st.video("chemartix_guide.mp4", autoplay=True)
+        st.markdown("""
+        <div style="background:#030604; border:1px solid #39ff14; border-radius:12px; padding:16px; margin-top:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <span style="color:#39ff14; font-weight:700;">▶ C.h.e.MartixAZE — Sürətli İstifadə Bələdçisi (00:45)</span>
+                <span style="background:#39ff14; color:#050806; padding:2px 8px; border-radius:6px; font-size:12px; font-weight:700;">HD • 45 SAN</span>
+            </div>
+            <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:10px; margin-top:8px;">
+                <div style="background:#0c1811; border:1px solid #1f4d32; padding:10px; border-radius:8px;">
+                    <b style="color:#00d4ff;">0:00 – 0:15 | 1-ci Addım</b><br>
+                    <span style="font-size:13px; color:#d8f3dc;">Sol paneldən <b>Rayonunuzu</b> seçin və ya <b>Manual</b> rejimdə pH, Azot və Rütubət rəqəmlərini daxil edin.</span>
+                </div>
+                <div style="background:#0c1811; border:1px solid #1f4d32; padding:10px; border-radius:8px;">
+                    <b style="color:#39ff14;">0:15 – 0:30 | 2-ci Addım</b><br>
+                    <span style="font-size:13px; color:#d8f3dc;"><b>Bitki Seçimi</b> qutusundan əkmək istədiyiniz bitkini (Pomidor, Pambıq, Turp və s.) seçin və 10 illik qrafikə baxın.</span>
+                </div>
+                <div style="background:#0c1811; border:1px solid #1f4d32; padding:10px; border-radius:8px;">
+                    <b style="color:#ffd166;">0:30 – 0:45 | 3-cü Addım</b><br>
+                    <span style="font-size:13px; color:#d8f3dc;"><b>Gəlir-Xərc</b> hesablamasını yoxlayın və sağ küncdəki <b>Nino AI</b>-dan suallarınıza dərhal cavab alın.</span>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
-else:
-    st.info(info_start)
+    # BÖLMƏ 2: TORPAQ KİMYASI METRİKLƏRİ VƏ NASA XƏRİTƏSİ
+    st.markdown('<div id="soil-metrics"></div>', unsafe_allow_html=True)
+    st.subheader(f"🧪 {selected_region} — Torpaq Kimyası və Peyk Göstəriciləri")
 
-st.markdown("---")
-st.markdown(f"<div style='text-align: center; color: #888; font-size: 14px;'><b>{footer_text}</b></div>", unsafe_allow_html=True)
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("Torpaq pH", f"{ph_val:.1f}", f"{ph_val - reg['prev_ph']:+.1f} keçən ilə görə")
+    m2.metric("Azot (N)", f"{n_val} mq/kq", "Optimal" if n_val >= 40 else "Aşağı")
+    m3.metric("NASA NDVI", f"{ndvi_val:.2f}", "Sağlam örtük" if ndvi_val >= 0.65 else "Zəif örtük")
+    m4.metric("Rütubət", f"{moist_val}%", "Normal" if moist_val >= 28 else "Suvarma lazımdır")
+
+    st.markdown('<div id="satellite-map"></div>', unsafe_allow_html=True)
+    with st.expander("🛰️ NASA Peyk və Monitorinq Xəritəsini Aç / Bağla", expanded=False):
+        m = folium.Map(location=[reg["lat"], reg["lon"]], zoom_start=11, tiles="CartoDB dark_matter")
+        folium.CircleMarker(
+            location=[reg["lat"], reg["lon"]],
+            radius=16,
+            color="#39ff14",
+            fill=True,
+            fill_color="#39ff14",
+            fill_opacity=0.45,
+            popup=f"{selected_region} | pH: {ph_val} | NDVI: {ndvi_val}"
+        ).add_to(m)
+        st_folium(m, width=750, height=280)
+
+    # BÖLMƏ 3: ÖTƏN 10 İLİN TORPAQ MƏHSULDARLIĞI
+    st.markdown('<div id="soil-10yr"></div>', unsafe_allow_html=True)
+    st.markdown("---")
+    st.subheader("📈 Ötən 10 İlin Torpaq Məhsuldarlığı və Artma-Azalma Aralığı (2017–2026)")
+
+    years_10 = [str(y) for y in range(2017, 2027)]
+    base_index = [72, 74, 71, 76, 79, 77, 82, 85, 84, round(ndvi_val * 115, 1)]
+    upper_band = [round(v + 4.5
+
