@@ -472,22 +472,70 @@ if all_mode or sec == "🤖 Nino AI Köməkçi":
                 st.session_state.nino_history.append(("Fermer", q_label))
                 st.session_state.nino_history.append(("Nino", q_ans))
 
+    import re
+
     with st.form("nino_custom_form", clear_on_submit=True):
-        custom_q = st.text_input("Öz şəxsi sualını yaz:", placeholder="Məs: 3 hektar turp əksəm nə qədər qazanaram?")
+        custom_q = st.text_input("Öz şəxsi sualını yaz:", placeholder="Məs: 5 hektara turp əksəm nə qədər qazanaram?")
         submitted = st.form_submit_button("Nino-ya Göndər")
         if submitted and custom_q.strip():
-            q_low = custom_q.lower()
-            if "qazanc" in q_low or "xərc" in q_low or "gəlir" in q_low or "pul" in q_low:
-                reply = f"{area_ha} ha {selected_crop} üçün təxmini xərc {total_cost:,} AZN, gəlir {total_rev:,} AZN, xalis qazanc {net_profit:,} AZN-dir (Sİ etibarlılığı: {crop_info['conf']}%)."
-            elif "ph" in q_low or "torpaq" in q_low or "azot" in q_low:
-                reply = f"{selected_region} üzrə pH: {ph_val}, Azot: {n_val} mq/kq, Rütubət: {moist_val}%, NDVI: {ndvi_val}."
-            elif "xəritə" in q_low or "koordinat" in q_low or "harada" in q_low:
-                reply = f"{selected_region} koordinatları: Lat {reg['lat']}, Lon {reg['lon']} — {reg['zone']}."
-            else:
-                reply = f"'{custom_q}' sualın üzrə {selected_region} (pH {ph_val}, NDVI {ndvi_val}) və {selected_crop} (xalis qazanc {net_profit:,} AZN) göstəricilərinə əsasən tövsiyə: {crop_info['steps'][0]}"
+            q_raw = custom_q.strip()
+            q_low = q_raw.lower()
 
-            st.session_state.nino_history.append(("Fermer", custom_q.strip()))
+            # 1. Sualda xüsusi bitki adı varmı yoxlayırıq
+            mentioned_crop = None
+            for c_name in CROPS.keys():
+                if c_name.lower() in q_low:
+                    mentioned_crop = c_name
+                    break
+
+            target_crop_name = mentioned_crop if mentioned_crop else selected_crop
+            t_info = CROPS[target_crop_name]
+            t_min, t_max = t_info["opt_ph"]
+            t_suitable = t_min <= ph_val <= t_max
+
+            # 2. Sualda hektar rəqəmi yazılıbsa tuturuq
+            ha_match = re.search(r"(\d+(?:[.,]\d+)?)\s*(?:hektar|ha)\b", q_low)
+            target_ha = float(ha_match.group(1).replace(",", ".")) if ha_match else area_ha
+
+            t_cost = round(t_info["cost_ha"] * target_ha)
+            t_rev = round(t_info["rev_ha"] * target_ha)
+            t_profit = t_rev - t_cost
+
+            # 3. Sualın mövzusuna görə dəqiq cavab qururuq
+            if any(k in q_low for k in ["qazanc", "xərc", "gəlir", "pul", "nə qədər", "neçə"]):
+                suit_txt = "uyğundur" if t_suitable else f"ideal pH [{t_min}–{t_max}] olduğu üçün əvvəl torpaq pH ({ph_val}) tənzimlənməlidir"
+                reply = (
+                    f"{selected_region} ({ph_val} pH) üçün {target_ha} ha **{target_crop_name}** hesabı: "
+                    f"xərc ~{t_cost:,} AZN, gəlir ~{t_rev:,} AZN, xalis qazanc ~{t_profit:,} AZN "
+                    f"(Sİ etibarlılığı: {t_info['conf']}%). Torpaq uyğunluğu: {suit_txt}."
+                )
+            elif any(k in q_low for k in ["suvar", "rütubət", "su"]):
+                reply = (
+                    f"{selected_region} üzrə hazırkı rütubət {moist_val}%-dir. "
+                    + ("Rütubət normaldır; damcı suvarma ilə sabit saxlamaq məsləhətdir. " if moist_val >= 28 else "Rütubət aşağıdır; suvarma tezliyini artırmaq lazımdır. ")
+                    + f"{target_crop_name} üçün tövsiyə: {t_info['steps'][0]}"
+                )
+            elif any(k in q_low for k in ["gübrə", "azot", "yemləmə"]):
+                reply = (
+                    f"{selected_region} üzrə Azot səviyyəsi {n_val} mq/kq-dır. "
+                    f"{target_crop_name} üçün əsas aqrokimyəvi addım: {t_info['steps'][1]}"
+                )
+            elif any(k in q_low for k in ["xəritə", "koordinat", "harada", "zona"]):
+                reply = f"{selected_region} koordinatları: Lat {reg['lat']}, Lon {reg['lon']} — {reg['zone']}."
+            elif any(k in q_low for k in ["uyğun", "olar", "əkmək", "ph"]):
+                reply = (
+                    f"{selected_region} torpağında pH {ph_val}-dir. **{target_crop_name}** üçün optimal pH [{t_min}–{t_max}]-dir. "
+                    + (f"Hazırkı şərait {target_crop_name} üçün uyğundur." if t_suitable else f"Hazırkı pH ({ph_val}) optimal aralıqdan kənardadır, əvvəl torpağı tənzimləmək lazımdır.")
+                )
+            else:
+                reply = (
+                    f"{selected_region} (pH {ph_val}, Azot {n_val} mq/kq, Rütubət {moist_val}%, NDVI {ndvi_val}) və "
+                    f"{target_ha} ha **{target_crop_name}** (xalis qazanc ~{t_profit:,} AZN) əsasında cavab: {t_info['steps'][0]}"
+                )
+
+            st.session_state.nino_history.append(("Fermer", q_raw))
             st.session_state.nino_history.append(("Nino", reply))
+
 
     chat_html = ""
     for sender, msg in st.session_state.nino_history[-8:]:
