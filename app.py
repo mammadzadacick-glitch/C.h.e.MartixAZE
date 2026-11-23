@@ -141,37 +141,329 @@ button[kind="secondary"]:hover *, button[kind="primary"]:hover *, .stButton > bu
 """, unsafe_allow_html=True)
 
 REGIONS = {
-    "Oğuz": {
-        "lat": 41.0714, "lon": 47.4653, "zone": "Şimal-Qərb dağətəyi zona (Xalxal / Baş Daşağıl istiqaməti)",
-        "ph": 6.2, "n": 48, "ndvi": 0.74, "moisture": 35,
-        "prev_ph": 6.0, "prev_yield": 4.2, "curr_yield": 4.8
+    "Abşeron": {
+        "lat": 40.4614, "lon": 49.7364, "zone": "Abşeron yarımadası və zeytun/badam-tərəvəz monitorinq zonası",
+        "ph": 7.7, "n": 32, "ndvi": 0.48, "moisture": 19,
+        "prev_ph": 7.8, "prev_yield": 2.6, "curr_yield": 2.9
     },
-    "Şəki": {
-        "lat": 41.1919, "lon": 47.1706, "zone": "Şəki düzənliyi və dağətəyi aqro-monitorinq zonası",
-        "ph": 6.5, "n": 52, "ndvi": 0.71, "moisture": 32,
-        "prev_ph": 6.4, "prev_yield": 4.0, "curr_yield": 4.5
+    "Ağcabədi": {
+        "lat": 40.0500, "lon": 47.4500, "zone": "Mil düzü pambıq, taxıl və yem bitkiləri zonası",
+        "ph": 7.5, "n": 38, "ndvi": 0.61, "moisture": 24,
+        "prev_ph": 7.6, "prev_yield": 3.4, "curr_yield": 3.7
     },
-    "Qəbələ": {
-        "lat": 40.9814, "lon": 47.8458, "zone": "Yüksək rütubətli meyvə-tərəvəz monitorinq zonası",
-        "ph": 6.1, "n": 55, "ndvi": 0.78, "moisture": 39,
-        "prev_ph": 5.9, "prev_yield": 4.6, "curr_yield": 5.1
+    "Ağdam": {
+        "lat": 39.9911, "lon": 46.9297, "zone": "Qarabağ düzənliyi və dağətəyi əkinçilik zonası",
+        "ph": 7.3, "n": 42, "ndvi": 0.64, "moisture": 27,
+        "prev_ph": 7.3, "prev_yield": 3.6, "curr_yield": 3.9
     },
-    "Sabirabad": {
-        "lat": 40.0087, "lon": 48.4770, "zone": "Muğan-Mil düzü suvarma və duzluluq nəzarət zonası",
-        "ph": 7.6, "n": 34, "ndvi": 0.56, "moisture": 22,
+    "Ağdaş": {
+        "lat": 40.6467, "lon": 47.4744, "zone": "Şirvan düzünün mərkəzi meyvə və taxıl zonası",
+        "ph": 7.2, "n": 43, "ndvi": 0.66, "moisture": 28,
+        "prev_ph": 7.2, "prev_yield": 3.7, "curr_yield": 4.0
+    },
+    "Ağstafa": {
+        "lat": 41.1189, "lon": 45.4539, "zone": "Kür çayı vadisi və Qazax-Tovuz əkinçilik zonası",
+        "ph": 7.1, "n": 44, "ndvi": 0.65, "moisture": 27,
+        "prev_ph": 7.1, "prev_yield": 3.6, "curr_yield": 3.9
+    },
+    "Ağsu": {
+        "lat": 40.5703, "lon": 48.3653, "zone": "Şirvan dağətəyi üzümçülük və taxıl zonası",
+        "ph": 7.0, "n": 45, "ndvi": 0.67, "moisture": 29,
+        "prev_ph": 7.0, "prev_yield": 3.8, "curr_yield": 4.1
+    },
+    "Astara": {
+        "lat": 38.4558, "lon": 48.8750, "zone": "Cənub subtropik sitrus, çay və tərəvəz zonası",
+        "ph": 5.7, "n": 62, "ndvi": 0.82, "moisture": 46,
+        "prev_ph": 5.6, "prev_yield": 5.0, "curr_yield": 5.5
+    },
+    "Babək": {
+        "lat": 39.1508, "lon": 45.4444, "zone": "Naxçıvan düzənliyi və dağətəyi aqro-monitorinq zonası",
+        "ph": 7.4, "n": 39, "ndvi": 0.59, "moisture": 23,
+        "prev_ph": 7.4, "prev_yield": 3.3, "curr_yield": 3.6
+    },
+    "Balakən": {
+        "lat": 41.7256, "lon": 46.4044, "zone": "Şimal-Qərb yüksək rütubətli fındıq və tərəvəz zonası",
+        "ph": 6.2, "n": 54, "ndvi": 0.77, "moisture": 38,
+        "prev_ph": 6.1, "prev_yield": 4.4, "curr_yield": 4.9
+    },
+    "Bərdə": {
+        "lat": 40.3758, "lon": 47.1267, "zone": "Mərkəzi Aran pambıq və taxılçılıq zonası",
+        "ph": 7.4, "n": 40, "ndvi": 0.63, "moisture": 26,
+        "prev_ph": 7.5, "prev_yield": 3.5, "curr_yield": 3.8
+    },
+    "Beyləqan": {
+        "lat": 39.7756, "lon": 47.6186, "zone": "Mil düzü pambıq, yonca və taxıl zonası",
+        "ph": 7.6, "n": 36, "ndvi": 0.58, "moisture": 23,
+        "prev_ph": 7.7, "prev_yield": 3.2, "curr_yield": 3.5
+    },
+    "Biləsuvar": {
+        "lat": 39.4589, "lon": 48.5450, "zone": "Muğan düzü pambıq və taxıl monitorinq zonası",
+        "ph": 7.7, "n": 35, "ndvi": 0.55, "moisture": 21,
         "prev_ph": 7.8, "prev_yield": 3.1, "curr_yield": 3.4
     },
-    "Gəncə-Göygöl": {
-        "lat": 40.5855, "lon": 46.3189, "zone": "Gəncə-Qazax əkinçilik və rütubət nəzarət zonası",
-        "ph": 6.8, "n": 45, "ndvi": 0.68, "moisture": 30,
-        "prev_ph": 6.7, "prev_yield": 3.9, "curr_yield": 4.3
+    "Cəbrayıl": {
+        "lat": 39.3989, "lon": 47.0244, "zone": "Cənub-Qərb dağətəyi və düzənlik əkinçilik zonası",
+        "ph": 7.2, "n": 41, "ndvi": 0.62, "moisture": 25,
+        "prev_ph": 7.2, "prev_yield": 3.4, "curr_yield": 3.7
+    },
+    "Cəlilabad": {
+        "lat": 39.2097, "lon": 48.5100, "zone": "Lənkəran-Muğan keçid kartof və taxıl zonası",
+        "ph": 6.9, "n": 46, "ndvi": 0.69, "moisture": 30,
+        "prev_ph": 6.8, "prev_yield": 4.0, "curr_yield": 4.4
+    },
+    "Culfa": {
+        "lat": 38.9556, "lon": 45.6297, "zone": "Arazboyu və dağətəyi meyvə-tərəvəz zonası",
+        "ph": 7.4, "n": 37, "ndvi": 0.54, "moisture": 22,
+        "prev_ph": 7.5, "prev_yield": 3.1, "curr_yield": 3.4
+    },
+    "Daşkəsən": {
+        "lat": 40.5203, "lon": 46.0819, "zone": "Kiçik Qafqaz yüksək dağlıq otlaq və kartof zonası",
+        "ph": 5.9, "n": 51, "ndvi": 0.73, "moisture": 37,
+        "prev_ph": 5.8, "prev_yield": 3.8, "curr_yield": 4.2
+    },
+    "Füzuli": {
+        "lat": 39.6008, "lon": 47.1431, "zone": "Qarabağın cənub-şərq düzənlik və üzüm-taxıl zonası",
+        "ph": 7.3, "n": 41, "ndvi": 0.62, "moisture": 25,
+        "prev_ph": 7.4, "prev_yield": 3.4, "curr_yield": 3.7
+    },
+    "Gədəbəy": {
+        "lat": 40.5683, "lon": 45.8169, "zone": "Yüksək dağlıq kartof və otlaq monitorinq zonası",
+        "ph": 5.8, "n": 53, "ndvi": 0.74, "moisture": 36,
+        "prev_ph": 5.7, "prev_yield": 3.9, "curr_yield": 4.3
+    },
+    "Goranboy": {
+        "lat": 40.6103, "lon": 46.7897, "zone": "Gəncə-Qazax düzənliyi və dağətəyi əkinçilik zonası",
+        "ph": 7.1, "n": 44, "ndvi": 0.66, "moisture": 28,
+        "prev_ph": 7.1, "prev_yield": 3.8, "curr_yield": 4.1
+    },
+    "Göyçay": {
+        "lat": 40.6236, "lon": 47.7400, "zone": "Şirvan düzü nar və bağçılıq monitorinq zonası",
+        "ph": 7.0, "n": 47, "ndvi": 0.70, "moisture": 30,
+        "prev_ph": 7.0, "prev_yield": 4.1, "curr_yield": 4.5
+    },
+    "Göygöl": {
+        "lat": 40.5858, "lon": 46.3189, "zone": "Dağətəyi üzüm, meyvə və tərəvəz zonası",
+        "ph": 6.7, "n": 48, "ndvi": 0.72, "moisture": 32,
+        "prev_ph": 6.6, "prev_yield": 4.1, "curr_yield": 4.5
+    },
+    "Hacıqabul": {
+        "lat": 40.0389, "lon": 48.9414, "zone": "Şirvan-Muğan quraq-mülayim əkinçilik zonası",
+        "ph": 7.7, "n": 33, "ndvi": 0.52, "moisture": 20,
+        "prev_ph": 7.8, "prev_yield": 2.9, "curr_yield": 3.2
+    },
+    "Xaçmaz": {
+        "lat": 41.4592, "lon": 48.8022, "zone": "Şimal-Şərq tərəvəz, bağçılıq və yaşıl örtük zonası",
+        "ph": 6.6, "n": 53, "ndvi": 0.77, "moisture": 36,
+        "prev_ph": 6.5, "prev_yield": 4.5, "curr_yield": 5.0
+    },
+    "Xızı": {
+        "lat": 40.9108, "lon": 49.0728, "zone": "Böyük Qafqazın cənub-şərq yamac monitorinq zonası",
+        "ph": 7.2, "n": 38, "ndvi": 0.57, "moisture": 24,
+        "prev_ph": 7.2, "prev_yield": 3.2, "curr_yield": 3.5
+    },
+    "Xocalı": {
+        "lat": 39.9131, "lon": 46.7903, "zone": "Qarabağ dağətəyi əkinçilik və meyvəçilik zonası",
+        "ph": 6.8, "n": 46, "ndvi": 0.68, "moisture": 31,
+        "prev_ph": 6.8, "prev_yield": 3.9, "curr_yield": 4.2
+    },
+    "Xocavənd": {
+        "lat": 39.7917, "lon": 47.1103, "zone": "Qarabağ dağətəyi və düzənlik monitorinq zonası",
+        "ph": 7.1, "n": 43, "ndvi": 0.65, "moisture": 27,
+        "prev_ph": 7.1, "prev_yield": 3.6, "curr_yield": 3.9
+    },
+    "İmişli": {
+        "lat": 39.8708, "lon": 48.0600, "zone": "Mil-Muğan pambıq, şəkər çuğunduru və taxıl zonası",
+        "ph": 7.6, "n": 37, "ndvi": 0.59, "moisture": 23,
+        "prev_ph": 7.7, "prev_yield": 3.3, "curr_yield": 3.6
+    },
+    "İsmayıllı": {
+        "lat": 40.7850, "lon": 48.1519, "zone": "Böyük Qafqaz cənub yamacı bağ və taxıl zonası",
+        "ph": 6.4, "n": 50, "ndvi": 0.74, "moisture": 34,
+        "prev_ph": 6.3, "prev_yield": 4.2, "curr_yield": 4.6
+    },
+    "Kəlbəcər": {
+        "lat": 40.1025, "lon": 46.0364, "zone": "Yüksək dağlıq yaylaq, otlaq və aqro-ekoloji zona",
+        "ph": 5.9, "n": 52, "ndvi": 0.72, "moisture": 36,
+        "prev_ph": 5.8, "prev_yield": 3.7, "curr_yield": 4.1
+    },
+    "Kəngərli": {
+        "lat": 39.3875, "lon": 45.1636, "zone": "Naxçıvan Arazboyu tərəvəz və bostan zonası",
+        "ph": 7.4, "n": 40, "ndvi": 0.60, "moisture": 24,
+        "prev_ph": 7.4, "prev_yield": 3.4, "curr_yield": 3.7
+    },
+    "Kürdəmir": {
+        "lat": 40.3425, "lon": 48.1561, "zone": "Şirvan düzü üzüm, taxıl və pambıq zonası",
+        "ph": 7.5, "n": 37, "ndvi": 0.57, "moisture": 22,
+        "prev_ph": 7.6, "prev_yield": 3.2, "curr_yield": 3.5
+    },
+    "Laçın": {
+        "lat": 39.6383, "lon": 46.5461, "zone": "Kiçik Qafqaz dağətəyi və yaylaq monitorinq zonası",
+        "ph": 6.1, "n": 49, "ndvi": 0.70, "moisture": 33,
+        "prev_ph": 6.0, "prev_yield": 3.7, "curr_yield": 4.0
+    },
+    "Lerik": {
+        "lat": 38.7736, "lon": 48.4150, "zone": "Talış dağları kartof, paxlalı və dağətəyi zona",
+        "ph": 6.0, "n": 50, "ndvi": 0.73, "moisture": 35,
+        "prev_ph": 5.9, "prev_yield": 3.9, "curr_yield": 4.3
     },
     "Lənkəran": {
         "lat": 38.7543, "lon": 48.8506, "zone": "Lənkəran subtropik və tərəvəzçilik zonası",
         "ph": 5.8, "n": 60, "ndvi": 0.81, "moisture": 44,
         "prev_ph": 5.7, "prev_yield": 4.9, "curr_yield": 5.4
     },
+    "Masallı": {
+        "lat": 39.0342, "lon": 48.6656, "zone": "Cənub düzənliyi və dağətəyi tərəvəz-çəltik zonası",
+        "ph": 6.1, "n": 56, "ndvi": 0.78, "moisture": 40,
+        "prev_ph": 6.0, "prev_yield": 4.6, "curr_yield": 5.1
+    },
+    "Neftçala": {
+        "lat": 39.3589, "lon": 49.2469, "zone": "Kür-Araz mənsəbi və Xəzərsahili əkinçilik zonası",
+        "ph": 7.8, "n": 33, "ndvi": 0.51, "moisture": 21,
+        "prev_ph": 7.9, "prev_yield": 2.8, "curr_yield": 3.1
+    },
+    "Oğuz": {
+        "lat": 41.0714, "lon": 47.4653, "zone": "Şimal-Qərb dağətəyi zona (Xalxal / Baş Daşağıl istiqaməti)",
+        "ph": 6.2, "n": 48, "ndvi": 0.74, "moisture": 35,
+        "prev_ph": 6.0, "prev_yield": 4.2, "curr_yield": 4.8
+    },
+    "Ordubad": {
+        "lat": 38.9036, "lon": 46.0231, "zone": "Naxçıvanın cənub-şərq bağçılıq və subtropik zonası",
+        "ph": 7.2, "n": 44, "ndvi": 0.64, "moisture": 27,
+        "prev_ph": 7.2, "prev_yield": 3.7, "curr_yield": 4.0
+    },
+    "Qax": {
+        "lat": 41.4183, "lon": 46.9206, "zone": "Şimal-Qərb fındıq, tütün və tərəvəz monitorinq zonası",
+        "ph": 6.3, "n": 52, "ndvi": 0.76, "moisture": 36,
+        "prev_ph": 6.2, "prev_yield": 4.3, "curr_yield": 4.8
+    },
+    "Qazax": {
+        "lat": 41.0925, "lon": 45.3656, "zone": "Qazax-Tovuz düzənliyi və dağətəyi əkinçilik zonası",
+        "ph": 7.1, "n": 45, "ndvi": 0.67, "moisture": 28,
+        "prev_ph": 7.1, "prev_yield": 3.8, "curr_yield": 4.1
+    },
+    "Qəbələ": {
+        "lat": 40.9814, "lon": 47.8458, "zone": "Yüksək rütubətli meyvə-tərəvəz monitorinq zonası",
+        "ph": 6.1, "n": 55, "ndvi": 0.78, "moisture": 39,
+        "prev_ph": 5.9, "prev_yield": 4.6, "curr_yield": 5.1
+    },
+    "Qobustan": {
+        "lat": 40.5317, "lon": 48.9289, "zone": "Şamaxı-Qobustan taxıl və dəmyə əkinçilik zonası",
+        "ph": 7.4, "n": 36, "ndvi": 0.54, "moisture": 22,
+        "prev_ph": 7.5, "prev_yield": 3.0, "curr_yield": 3.3
+    },
+    "Quba": {
+        "lat": 41.3611, "lon": 48.5131, "zone": "Şimal meyvəçilik və dağətəyi monitorinq zonası",
+        "ph": 6.4, "n": 50, "ndvi": 0.75, "moisture": 34,
+        "prev_ph": 6.3, "prev_yield": 4.3, "curr_yield": 4.7
+    },
+    "Qubadlı": {
+        "lat": 39.3442, "lon": 46.5819, "zone": "Həkəri çayı vadisi və dağətəyi əkinçilik zonası",
+        "ph": 6.9, "n": 44, "ndvi": 0.66, "moisture": 29,
+        "prev_ph": 6.9, "prev_yield": 3.7, "curr_yield": 4.0
+    },
+    "Qusar": {
+        "lat": 41.4275, "lon": 48.4361, "zone": "Şahdağ ətəyi meyvə, kartof və tərəvəz zonası",
+        "ph": 6.3, "n": 51, "ndvi": 0.75, "moisture": 35,
+        "prev_ph": 6.2, "prev_yield": 4.2, "curr_yield": 4.6
+    },
+    "Saatlı": {
+        "lat": 39.9317, "lon": 48.3689, "zone": "Muğan düzü pambıq, bostan və taxıl zonası",
+        "ph": 7.6, "n": 36, "ndvi": 0.57, "moisture": 22,
+        "prev_ph": 7.7, "prev_yield": 3.2, "curr_yield": 3.5
+    },
+    "Sabirabad": {
+        "lat": 40.0087, "lon": 48.4770, "zone": "Muğan-Mil düzü suvarma və duzluluq nəzarət zonası",
+        "ph": 7.6, "n": 34, "ndvi": 0.56, "moisture": 22,
+        "prev_ph": 7.8, "prev_yield": 3.1, "curr_yield": 3.4
+    },
+    "Salyan": {
+        "lat": 39.5961, "lon": 48.9847, "zone": "Cənub-Şərq Muğan əkinçilik və suvarma zonası",
+        "ph": 7.7, "n": 34, "ndvi": 0.54, "moisture": 21,
+        "prev_ph": 7.8, "prev_yield": 3.0, "curr_yield": 3.3
+    },
+    "Samux": {
+        "lat": 40.7611, "lon": 46.4056, "zone": "Kürboyu bağçılıq və taxıl monitorinq zonası",
+        "ph": 7.2, "n": 43, "ndvi": 0.65, "moisture": 27,
+        "prev_ph": 7.2, "prev_yield": 3.7, "curr_yield": 4.0
+    },
+    "Siyəzən": {
+        "lat": 41.0783, "lon": 49.1114, "zone": "Şimal-Şərq sahil və dağətəyi monitorinq zonası",
+        "ph": 7.3, "n": 39, "ndvi": 0.58, "moisture": 24,
+        "prev_ph": 7.3, "prev_yield": 3.3, "curr_yield": 3.6
+    },
+    "Şabran": {
+        "lat": 41.2000, "lon": 48.8833, "zone": "Şimal-Şərq tərəvəz və taxıl monitorinq zonası",
+        "ph": 7.0, "n": 45, "ndvi": 0.66, "moisture": 28,
+        "prev_ph": 7.0, "prev_yield": 3.8, "curr_yield": 4.1
+    },
+    "Şamaxı": {
+        "lat": 40.6314, "lon": 48.6414, "zone": "Dağlıq Şirvan üzüm, taxıl və meyvə zonası",
+        "ph": 7.1, "n": 44, "ndvi": 0.65, "moisture": 28,
+        "prev_ph": 7.1, "prev_yield": 3.7, "curr_yield": 4.0
+    },
+    "Şəki": {
+        "lat": 41.1919, "lon": 47.1706, "zone": "Şəki düzənliyi və dağətəyi aqro-monitorinq zonası",
+        "ph": 6.5, "n": 52, "ndvi": 0.71, "moisture": 32,
+        "prev_ph": 6.4, "prev_yield": 4.0, "curr_yield": 4.5
+    },
+    "Şəmkir": {
+        "lat": 40.8297, "lon": 46.0189, "zone": "Qərb tərəvəzçilik və istixana-tarla zonası",
+        "ph": 7.0, "n": 49, "ndvi": 0.72, "moisture": 31,
+        "prev_ph": 6.9, "prev_yield": 4.1, "curr_yield": 4.5
+    },
+    "Şərur": {
+        "lat": 39.5536, "lon": 44.9844, "zone": "Şərur düzü tütün, üzüm və tərəvəz zonası",
+        "ph": 7.3, "n": 45, "ndvi": 0.66, "moisture": 28,
+        "prev_ph": 7.3, "prev_yield": 3.8, "curr_yield": 4.1
+    },
+    "Şuşa": {
+        "lat": 39.7600, "lon": 46.7464, "zone": "Qarabağ yüksək dağətəyi ekoloji və yaşıl zona",
+        "ph": 6.4, "n": 48, "ndvi": 0.73, "moisture": 34,
+        "prev_ph": 6.3, "prev_yield": 3.8, "curr_yield": 4.1
+    },
+    "Tərtər": {
+        "lat": 40.3419, "lon": 46.9375, "zone": "Tərtər çayı vadisi və Qarabağ düzənliyi zonası",
+        "ph": 7.2, "n": 44, "ndvi": 0.67, "moisture": 29,
+        "prev_ph": 7.2, "prev_yield": 3.9, "curr_yield": 4.2
+    },
+    "Tovuz": {
+        "lat": 40.9925, "lon": 45.6267, "zone": "Qərb kartof, üzüm və tərəvəz monitorinq zonası",
+        "ph": 6.9, "n": 47, "ndvi": 0.70, "moisture": 30,
+        "prev_ph": 6.8, "prev_yield": 4.0, "curr_yield": 4.4
+    },
+    "Ucar": {
+        "lat": 40.5172, "lon": 47.6547, "zone": "Şirvan düzü pambıq, yonca və meyvə zonası",
+        "ph": 7.5, "n": 38, "ndvi": 0.60, "moisture": 24,
+        "prev_ph": 7.5, "prev_yield": 3.4, "curr_yield": 3.7
+    },
+    "Yardımlı": {
+        "lat": 38.9061, "lon": 48.2411, "zone": "Talış dağətəyi və yüksək əkinçilik zonası",
+        "ph": 6.1, "n": 47, "ndvi": 0.68, "moisture": 32,
+        "prev_ph": 6.0, "prev_yield": 3.6, "curr_yield": 3.9
+    },
+    "Yevlax": {
+        "lat": 40.6183, "lon": 47.1500, "zone": "Kür-Şirvan pambıq, taxıl və bostan zonası",
+        "ph": 7.4, "n": 39, "ndvi": 0.62, "moisture": 25,
+        "prev_ph": 7.5, "prev_yield": 3.5, "curr_yield": 3.8
+    },
+    "Zaqatala": {
+        "lat": 41.6308, "lon": 46.6442, "zone": "Şimal-Qərb fındıq, qarğıdalı və tərəvəz zonası",
+        "ph": 6.2, "n": 53, "ndvi": 0.76, "moisture": 37,
+        "prev_ph": 6.1, "prev_yield": 4.4, "curr_yield": 4.9
+    },
+    "Zəngilan": {
+        "lat": 39.0836, "lon": 46.6525, "zone": "Arazboyu və Həkəri qovşağı əkinçilik zonası",
+        "ph": 7.2, "n": 42, "ndvi": 0.63, "moisture": 26,
+        "prev_ph": 7.2, "prev_yield": 3.5, "curr_yield": 3.8
+    },
+    "Zərdab": {
+        "lat": 40.2178, "lon": 47.7131, "zone": "Kür-Araz düzənliyi taxıl, yonca və pambıq zonası",
+        "ph": 7.6, "n": 36, "ndvi": 0.58, "moisture": 23,
+        "prev_ph": 7.7, "prev_yield": 3.2, "curr_yield": 3.5
+    },
 }
+
+
 
 CROPS = {
     "Pomidor": {
