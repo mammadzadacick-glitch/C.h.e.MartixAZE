@@ -340,11 +340,16 @@ if all_mode or sec == "🛰️ NASA Peyk Xəritəsi":
         f"Enlik (Lat): `{reg['lat']}` | Uzunluq (Lon): `{reg['lon']}` | "
         f"Zona: {reg['zone']} | NDVI: `{ndvi_val}` | pH: `{ph_val}`"
     )
-    m = folium.Map(location=[reg["lat"], reg["lon"]], zoom_start=11, tiles="OpenStreetMap")
+    m = folium.Map(
+        location=[reg["lat"], reg["lon"]],
+        zoom_start=11,
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri World Imagery"
+    )
     folium.Circle(
         location=[reg["lat"], reg["lon"]],
         radius=3500,
-        color="#0077b6",
+        color="#39ff14",
         fill=True,
         fill_color="#39ff14",
         fill_opacity=0.22,
@@ -356,6 +361,7 @@ if all_mode or sec == "🛰️ NASA Peyk Xəritəsi":
         tooltip=f"{selected_region} — Dəqiq Mərkəz Nöqtəsi"
     ).add_to(m)
     st_folium(m, width=760, height=300)
+
 
 if all_mode or sec == "📈 10 İllik Torpaq Məhsuldarlığı":
     st.markdown("---")
