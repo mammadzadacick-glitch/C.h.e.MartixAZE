@@ -323,5 +323,7 @@ with main_col:
 
     years_10 = [str(y) for y in range(2017, 2027)]
     base_index = [72, 74, 71, 76, 79, 77, 82, 85, 84, round(ndvi_val * 115, 1)]
-    upper_band = [round(v + 4.5
+    upper_band = [round(v + 4.5, 1) for v in base_index]
+    lower_band = [round(v - 4.5, 1) for v in base_index]
+
 
